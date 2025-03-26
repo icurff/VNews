@@ -5,6 +5,8 @@ plugins {
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.serialization") version "2.1.10"
     id("com.google.dagger.hilt.android")
+
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -43,6 +45,11 @@ android {
 }
 
 dependencies {
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation(platform("com.google.firebase:firebase-bom:33.11.0"))
+    implementation("com.google.firebase:firebase-analytics")
+
     implementation("com.prof18.rssparser:rssparser-android:6.0.10")
 
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
@@ -58,6 +65,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.7.0")
 
     implementation("androidx.room:room-runtime:2.7.0-rc02")
+    implementation(libs.googleid)
     ksp("androidx.room:room-compiler:2.6.1")
 
     implementation("com.google.dagger:hilt-android:2.56")

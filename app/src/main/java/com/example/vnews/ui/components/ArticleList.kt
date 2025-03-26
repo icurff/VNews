@@ -30,7 +30,7 @@ import coil.compose.AsyncImage
 import com.example.vnews.ui.navigation.Screen
 import com.example.vnews.ui.viewmodel.ArticleViewModel
 import com.example.vnews.ui.viewmodel.RssItem
-import com.example.vnews.util.DateTimeUtils
+import com.example.vnews.utils.DateTimeUtil
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -129,7 +129,7 @@ private fun ArticleItemCard(
 
                 }
                 Text(
-                    text = DateTimeUtils.getRelativeTime(item.pubTime),
+                    text = DateTimeUtil.getRelativeTime(item.pubTime),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

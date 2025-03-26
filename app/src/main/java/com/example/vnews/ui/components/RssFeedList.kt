@@ -17,8 +17,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,10 +36,11 @@ import com.example.vnews.ui.navigation.Screen
 import com.example.vnews.ui.viewmodel.ArticleViewModel
 import com.example.vnews.ui.viewmodel.RssItem
 import com.example.vnews.ui.viewmodel.RssViewModel
-import com.example.vnews.util.DateTimeUtils
+import com.example.vnews.utils.DateTimeUtil
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RssFeedList(
     rssViewModel: RssViewModel,
@@ -48,7 +51,7 @@ fun RssFeedList(
 ) {
     val rssItems by rssViewModel.rssItems.collectAsState()
     val isLoading by rssViewModel.isLoading.collectAsState()
-
+    val isRefreshing by rssViewModel.isRefreshing.collectAsState()
     val itemsList = rssItems[categoryId] ?: emptyList()
 
 
@@ -60,22 +63,35 @@ fun RssFeedList(
             CircularProgressIndicator()
         }
     } else {
-        LazyColumn(
-            modifier = modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+        PullToRefreshBox(
+            isRefreshing = isLoading,
+            onRefresh = {
+                rssViewModel.handleRefreshFeed()
+            },
+            modifier = modifier
         ) {
-            items(itemsList) { item ->
-                RssItemCard(
-                    item = item,
-                    onClick = { handleRssItemCardClick(item, articleViewModel, navController) }
-                )
+            LazyColumn(
+                modifier = modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(itemsList) { item ->
+                    RssItemCard(
+                        item = item,
+                        onClick = { handleRssItemCardClick(item, articleViewModel, navController) }
+                    )
+                }
             }
         }
     }
 }
 
-fun handleRssItemCardClick(item: RssItem, articleViewModel: ArticleViewModel, navController: NavController) {
+
+fun handleRssItemCardClick(
+    item: RssItem,
+    articleViewModel: ArticleViewModel,
+    navController: NavController
+) {
     articleViewModel.setSelectedArticle(item)
     val encodedUrl = URLEncoder.encode(item.source, StandardCharsets.UTF_8.toString())
     navController.navigate(Screen.ArticleDetail.createRoute(encodedUrl))
@@ -144,7 +160,7 @@ private fun RssItemCard(
 
                 }
                 Text(
-                    text = DateTimeUtils.getRelativeTime(item.pubTime),
+                    text = DateTimeUtil.getRelativeTime(item.pubTime),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

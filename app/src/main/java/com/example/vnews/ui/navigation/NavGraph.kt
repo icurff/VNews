@@ -21,7 +21,7 @@ import com.example.vnews.ui.screens.ArticleDetailScreen
 import com.example.vnews.ui.screens.CommunityScreen
 import com.example.vnews.ui.screens.HomeScreen
 import com.example.vnews.ui.screens.SavedArticlesScreen
-import com.example.vnews.ui.screens.SettingsScreen
+import com.example.vnews.ui.screens.UserScreen
 import com.example.vnews.ui.screens.ViewedArticlesScreen
 import com.example.vnews.ui.viewmodel.ArticleViewModel
 import com.example.vnews.ui.viewmodel.RssViewModel
@@ -44,8 +44,8 @@ sealed class Screen(
 
     object Settings : Screen(
         route = "settings",
-        title = "Settings",
-        icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") }
+        title = "User",
+        icon = { Icon(Icons.Default.Settings, contentDescription = "User") }
     )
 
     object ArticleDetail : Screen("article/{articleSource}") {
@@ -64,7 +64,7 @@ fun NavGraph(navController: NavHostController) {
         startDestination = Screen.Home.route,
     ) {
         composable(Screen.Community.route) {
-            CommunityScreen()
+            CommunityScreen(navController)
         }
 
         navigation(
@@ -121,7 +121,7 @@ fun NavGraph(navController: NavHostController) {
         }
 
         navigation(startDestination = "settings", route = "settings_graph") {
-            composable(Screen.Settings.route) { SettingsScreen(navController) }
+            composable(Screen.Settings.route) { UserScreen(navController) }
 
             composable(
                 route = Screen.SavedArticles.route,

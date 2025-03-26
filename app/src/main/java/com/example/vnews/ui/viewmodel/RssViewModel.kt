@@ -1,14 +1,10 @@
 package com.example.vnews.ui.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vnews.data.data_provider.Categories
 import com.example.vnews.data.data_provider.ExtensionEntities
-import com.example.vnews.data.model.ArticleContent
-import com.example.vnews.data.repository.ArticleRepository
-import com.example.vnews.util.DateTimeUtils
-import com.example.vnews.util.HtmlParser
+import com.example.vnews.utils.DateTimeUtil
 import com.prof18.rssparser.RssParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +34,9 @@ class RssViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+
     private val _rssItems = MutableStateFlow<Map<Int, List<RssItem>>>(emptyMap())
     val rssItems: StateFlow<Map<Int, List<RssItem>>> = _rssItems.asStateFlow()
 
@@ -63,6 +62,16 @@ class RssViewModel @Inject constructor(
         }
     }
 
+    fun handleRefreshFeed() {
+        _isRefreshing.value = true
+        try {
+            fetchAllCategories()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            _isRefreshing.value = false
+        }
+    }
 
     private fun updateRssItems(categoryId: Int, newItems: List<RssItem>) {
         _rssItems.value = _rssItems.value.toMutableMap().apply {
@@ -89,7 +98,7 @@ class RssViewModel @Inject constructor(
                                     title = item.title ?: "",
                                     summary = Jsoup.parse(item.description ?: "").text(),
                                     source = item.link ?: "",
-                                    pubTime = DateTimeUtils.parseDateToUnix(item.pubDate ?: ""),
+                                    pubTime = DateTimeUtil.parseDateToUnix(item.pubDate ?: ""),
                                     thumbnail = item.image ?: "",
                                     extensionName = extension.name,
                                     extensionIcon = extension.icon

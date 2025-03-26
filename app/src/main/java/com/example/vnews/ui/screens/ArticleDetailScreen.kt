@@ -43,9 +43,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.vnews.data.model.ArticleItem
 import com.example.vnews.ui.viewmodel.ArticleViewModel
-import com.example.vnews.ui.viewmodel.RssViewModel
-import com.example.vnews.util.DateTimeUtils
-import com.example.vnews.util.TextToSpeechUtil
+import com.example.vnews.utils.DateTimeUtil
+import com.example.vnews.utils.TextToSpeechUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -163,7 +162,7 @@ fun ArticleDetailScreen(
 
             item {
                 Text(
-                    text = DateTimeUtils.getRelativeTime(selectedArticle!!.pubTime),
+                    text = DateTimeUtil.getRelativeTime(selectedArticle!!.pubTime),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

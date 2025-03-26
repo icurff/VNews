@@ -1,4 +1,4 @@
-package com.example.vnews.util
+package com.example.vnews.utils
 
 import android.content.Context
 import android.speech.tts.TextToSpeech

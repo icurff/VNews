@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.vnews.data.local.entity.ArticleEntity
 import com.example.vnews.data.model.ArticleContent
 import com.example.vnews.data.repository.ArticleRepository
-import com.example.vnews.util.HtmlParser
+import com.example.vnews.utils.WebScraper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -105,7 +105,7 @@ class ArticleViewModel @Inject constructor(
                     articleRepository.markArticleAsViewed(rssItem)
                 }
                 launch(Dispatchers.IO) {
-                    _articleContent.value = HtmlParser.fetchArticleContent(rssItem.source)
+                    _articleContent.value = WebScraper.fetchArticleContent(rssItem.source)
                 }
             } catch (e: Exception) {
                 Log.e("ArticleViewModel", "Error setting selected article", e)

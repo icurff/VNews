@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "899795293611",
+    "project_id": "dacs3-4aacc",
+    "storage_bucket": "dacs3-4aacc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:899795293611:android:05b51e23df788880a7aeee",
+        "android_client_info": {
+          "package_name": "com.example.vnews"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "899795293611-j27r95ubb5u2qask61t4phr823mkdjfi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.vnews",
+            "certificate_hash": "804fbf142f38b2d32bf6756eaabbec9472d4afed"
+          }
+        },
+        {
+          "client_id": "899795293611-lcauiuqpasiustkkplgirnvncmktrf8e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1E_HjDSGG61zUwYCdDZVmjmo3XRz5so4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "899795293611-lcauiuqpasiustkkplgirnvncmktrf8e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

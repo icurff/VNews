@@ -1,4 +1,4 @@
-package com.example.vnews.util
+package com.example.vnews.utils
 
 import com.example.vnews.data.model.ArticleContent
 import com.example.vnews.data.model.ArticleItem
@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 
-object HtmlParser {
+object WebScraper {
     suspend fun fetchArticleContent(url: String): ArticleContent {
         return withContext(Dispatchers.IO) {
             val doc = Jsoup.connect(url).get()

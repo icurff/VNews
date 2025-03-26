@@ -1,4 +1,4 @@
-package com.example.vnews.util
+package com.example.vnews.utils
 
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -6,7 +6,7 @@ import java.time.format.DateTimeParseException
 import java.util.Locale
 import kotlin.math.abs
 
-object DateTimeUtils {
+object DateTimeUtil {
     private val dateFormats = listOf(
         // Format 1: Xử lý ngày tháng với năm 4 chữ số và múi giờ Z
         // Ví dụ: "Fri, 21 Mar 2025 16:14:00 +0700"
