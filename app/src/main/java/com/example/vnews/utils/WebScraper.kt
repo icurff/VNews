@@ -49,8 +49,10 @@ object WebScraper {
                     "figure" -> {
                         // Xử lý ảnh đơn lẻ
                         val img = element.selectFirst("img")
-                        val sourceUrl = img?.attr("data-original")
+                        val sourceUrl = img?.attr("data-src")
                             ?.takeIf { it.isNotEmpty() }
+                            ?: img?.attr("data-original")
+                                ?.takeIf { it.isNotEmpty() }
                             ?: img?.attr("src")
 
                         val caption = element.selectFirst("figcaption")?.text()?.trim() ?: ""

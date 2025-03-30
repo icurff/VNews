@@ -95,7 +95,8 @@ class RssViewModel @Inject constructor(
                             val items = channel.items.map { item ->
 
                                 RssItem(
-                                    title = item.title ?: "",
+                                    title = Jsoup.parse(item.title ?: "").text()
+                                        .replace("&apos;", "'"),
                                     summary = Jsoup.parse(item.description ?: "").text(),
                                     source = item.link ?: "",
                                     pubTime = DateTimeUtil.parseDateToUnix(item.pubDate ?: ""),

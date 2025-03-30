@@ -12,6 +12,7 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,6 +37,8 @@ class UserViewModel @Inject constructor(
     private val _userPhotoUrl = MutableStateFlow<String?>(null)
     val userPhotoUrl: StateFlow<String?> = _userPhotoUrl.asStateFlow()
 
+    private val db = FirebaseFirestore.getInstance()
+
     init {
         auth.currentUser?.let { user ->
             _isLoggedIn.value = true
@@ -44,13 +47,23 @@ class UserViewModel @Inject constructor(
         }
     }
 
+    private suspend fun saveUserToFirestore(user: com.google.firebase.auth.FirebaseUser) {
+        val userData = hashMapOf(
+            "name" to (user.displayName ?: "Guest"),
+            "email" to user.email,
+            "avatar" to user.photoUrl?.toString(),
+            "createdAt" to com.google.firebase.Timestamp.now()
+        )
+        db.collection("users").document(user.uid).set(userData).await()
+    }
+
     fun signInWithGoogle(activity: Activity) {
         val credentialManager = CredentialManager.create(activity)
 
         val googleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false)
             .setServerClientId(appContext.getString(R.string.default_web_client_id))
-            .setAutoSelectEnabled(true)
+            .setFilterByAuthorizedAccounts(false)
+            .setAutoSelectEnabled(false)
             .build()
         // Create the Credential Manager request
         val request = GetCredentialRequest.Builder()
@@ -75,6 +88,7 @@ class UserViewModel @Inject constructor(
                     _isLoggedIn.value = true
                     _userName.value = user.displayName ?: "Guest"
                     _userPhotoUrl.value = user.photoUrl?.toString()
+                    saveUserToFirestore(user)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -90,7 +104,6 @@ class UserViewModel @Inject constructor(
             _isLoggedIn.value = false
             _userName.value = "Guest"
             _userPhotoUrl.value = null
-
         }
     }
 } 

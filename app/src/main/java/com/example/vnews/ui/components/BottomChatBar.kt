@@ -27,9 +27,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
-
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
@@ -68,21 +67,22 @@ fun BottomChatBar() {
                 )
             )
 
-
-            IconButton(onClick ={}) {
-                Icon(
-                    imageVector = Icons.Filled.Image,
-                    contentDescription = "Attach image",
-                    tint = Gray
-                )
-            }
+//            IconButton(onClick ={}) {
+//                Icon(
+//                    imageVector = Icons.Filled.Image,
+//                    contentDescription = "Attach image",
+//                    tint = Gray
+//                )
+//            }
             IconButton(onClick = {
                 if (messageText.isNotBlank() && currentUser != null) {
                     scope.launch {
-                        val messageData = mapOf(
+                        val messageData = hashMapOf(
                             "message" to messageText,
                             "senderId" to currentUser.uid,
-                            "timestamp" to FieldValue.serverTimestamp()
+                            "senderName" to (currentUser.displayName ?: "Guest"),
+                            "senderAvatar" to currentUser.photoUrl?.toString(),
+                            "timestamp" to Timestamp.now()
                         )
                         db.collection("messages").add(messageData)
                         messageText = ""
@@ -97,5 +97,4 @@ fun BottomChatBar() {
             }
         }
     }
-
 }

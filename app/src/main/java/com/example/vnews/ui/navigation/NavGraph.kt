@@ -106,6 +106,26 @@ fun NavGraph(navController: NavHostController) {
                         animationSpec = tween(300, easing = FastOutSlowInEasing),
                         towards = AnimatedContentTransitionScope.SlideDirection.Start
                     )
+                },
+                popEnterTransition = {
+                    fadeIn(
+                        animationSpec = tween(
+                            300, easing = FastOutSlowInEasing
+                        )
+                    ) + slideIntoContainer(
+                        animationSpec = tween(300, easing = FastOutSlowInEasing),
+                        towards = AnimatedContentTransitionScope.SlideDirection.End
+                    )
+                },
+                popExitTransition = {
+                    fadeOut(
+                        animationSpec = tween(
+                            300, easing = FastOutSlowInEasing
+                        )
+                    ) + slideOutOfContainer(
+                        animationSpec = tween(300, easing = FastOutSlowInEasing),
+                        towards = AnimatedContentTransitionScope.SlideDirection.End
+                    )
                 }
             ) { backStackEntry ->
                 val parentEntry = remember(backStackEntry) {
@@ -173,6 +193,26 @@ fun NavGraph(navController: NavHostController) {
                     ) + slideOutOfContainer(
                         animationSpec = tween(300, easing = FastOutSlowInEasing),
                         towards = AnimatedContentTransitionScope.SlideDirection.Start
+                    )
+                },
+                popEnterTransition = {
+                    fadeIn(
+                        animationSpec = tween(
+                            300, easing = FastOutSlowInEasing
+                        )
+                    ) + slideIntoContainer(
+                        animationSpec = tween(300, easing = FastOutSlowInEasing),
+                        towards = AnimatedContentTransitionScope.SlideDirection.End
+                    )
+                },
+                popExitTransition = {
+                    fadeOut(
+                        animationSpec = tween(
+                            300, easing = FastOutSlowInEasing
+                        )
+                    ) + slideOutOfContainer(
+                        animationSpec = tween(300, easing = FastOutSlowInEasing),
+                        towards = AnimatedContentTransitionScope.SlideDirection.End
                     )
                 }
             ) { backStackEntry ->

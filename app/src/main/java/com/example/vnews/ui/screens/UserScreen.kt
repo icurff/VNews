@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,18 +24,23 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +55,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.vnews.R
 import com.example.vnews.ui.components.BottomNavBar
+import com.example.vnews.ui.components.PasswordTextField
 import com.example.vnews.ui.navigation.Screen
 import com.example.vnews.ui.viewmodel.UserViewModel
 
@@ -62,6 +69,8 @@ fun UserScreen(
     val userName by viewModel.userName.collectAsState()
     val userPhotoUrl by viewModel.userPhotoUrl.collectAsState()
     val context = LocalContext.current
+
+
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -221,6 +230,8 @@ fun UserProfile(
     userPhotoUrl: String?,
     onGoogleSignInClick: () -> Unit
 ) {
+//    var showRegisterDialog by remember { mutableStateOf(false) }
+//    var showLoginDialog by remember { mutableStateOf(false) }
     Column(modifier = Modifier.padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
@@ -273,5 +284,121 @@ fun UserProfile(
                 )
             }
         }
+//        Spacer(modifier = Modifier.width(16.dp))
+//        Row(
+//            modifier = Modifier.fillMaxWidth(),
+//            horizontalArrangement = Arrangement.spacedBy(8.dp)
+//        ) {
+//            Button(onClick = { showLoginDialog = true }, modifier = Modifier.weight(1f)) {
+//                Text("Login")
+//            }
+//            Button(onClick = { showRegisterDialog = true }, modifier = Modifier.weight(1f)) {
+//                Text("Register")
+//            }
+//        }
+//        RegisterDialog(
+//            showDialog = showRegisterDialog,
+//            onDismiss = { showRegisterDialog = false })
+//        LoginDialog(
+//            showDialog = showLoginDialog,
+//            onDismiss = { showLoginDialog = false },
+//            onLoginGoogle = onGoogleSignInClick
+//        )
     }
 }
+
+//@Composable
+//fun RegisterDialog(showDialog: Boolean, onDismiss: () -> Unit) {
+//    if (showDialog) {
+//        AlertDialog(
+//            onDismissRequest = { onDismiss() },
+//            title = { Text("Register") },
+//            text = {
+//                Column {
+//                    var userName by remember { mutableStateOf("") }
+//                    var email by remember { mutableStateOf("") }
+//                    var password by remember { mutableStateOf("") }
+//
+//                    OutlinedTextField(
+//                        value = userName,
+//                        onValueChange = { userName = it },
+//                        label = { Text("User Name") }
+//                    )
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                    OutlinedTextField(
+//                        value = email,
+//                        onValueChange = { email = it },
+//                        label = { Text("Email") }
+//                    )
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                    PasswordTextField(password, onPasswordChange = { password = it })
+//                }
+//            },
+//            confirmButton = {
+//                Button(onClick = { onDismiss() }) {
+//                    Text("Submit")
+//                }
+//            },
+//        )
+//    }
+//}
+//
+//@Composable
+//fun LoginDialog(showDialog: Boolean, onDismiss: () -> Unit, onLoginGoogle: () -> Unit) {
+//    if (showDialog) {
+//        AlertDialog(
+//            onDismissRequest = { onDismiss() },
+//            title = { Text("Login") },
+//            text = {
+//                Column {
+//                    var email by remember { mutableStateOf("") }
+//                    var password by remember { mutableStateOf("") }
+//
+//                    OutlinedTextField(
+//                        value = email,
+//                        onValueChange = { email = it },
+//                        label = { Text("Email") }
+//                    )
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                    PasswordTextField(password, onPasswordChange = { password = it })
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        horizontalArrangement = Arrangement.End
+//                    ) {
+//                        Text(text = "Forgot Password ?", modifier = Modifier.clickable { })
+//                    }
+//                }
+//            },
+//            confirmButton = {
+//                Column(modifier = Modifier.fillMaxWidth()) {
+//                    Button(modifier = Modifier.fillMaxWidth(), onClick = {
+//
+//                        onDismiss()
+//                    }) {
+//                        Text("Login")
+//                    }
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                    Button(modifier = Modifier.fillMaxWidth(), onClick = {
+//                        onLoginGoogle()
+//                        onDismiss()
+//                    }) {
+//                        Icon(
+//                            painter = painterResource(id = R.drawable.ic_google),
+//                            contentDescription = "Google Icon",
+//                            modifier = Modifier.size(24.dp),
+//                            tint = Color.Unspecified
+//                        )
+//                        Spacer(modifier = Modifier.width(8.dp))
+//                        Text(
+//                            text = "Login with Google",
+//                            color = Color.Black,
+//                            fontWeight = FontWeight.Bold
+//                        )
+//                    }
+//                }
+//            },
+//        )
+//    }
+//}
+//

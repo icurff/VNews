@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.vnews.data.model.ArticleItem
 import com.example.vnews.ui.viewmodel.ArticleViewModel
 import com.example.vnews.utils.DateTimeUtil
@@ -202,7 +203,10 @@ fun ArticleDetailScreen(
                                 verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
                                 AsyncImage(
-                                    model = item.url,
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(item.url)
+                                        .crossfade(true)
+                                        .build(),
                                     contentDescription = item.caption,
                                     modifier = Modifier
                                         .fillMaxWidth()
