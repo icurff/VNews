@@ -1,5 +1,6 @@
 package com.example.vnews.di
 
+import com.example.vnews.data.remote.RepoApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,11 +29,12 @@ object NetworkModule {
             .build()
     }
 
-//    @Provides
-//    @Singleton
-//    fun provideRepoApiService(retrofit: Retrofit): RepoApiService {
-//        return retrofit.create(RepoApiService::class.java)
-//    }
+    @Provides
+    @Singleton
+    fun provideRepoApiService(retrofit: Retrofit): RepoApiService {
+        return retrofit.create(RepoApiService::class.java)
+    }
+
 //    @Provides
 //    @Singleton
 //    fun provideExtensionApiService(retrofit: Retrofit): ExtensionApiService {

@@ -5,7 +5,7 @@ data class CategoryEntity(
     val name: String
 )
 
-data class ExtensionEntity(
+data class DefaultExtension(
     val id: Int,
     val categoryId: Int,
     val name: String,
@@ -31,42 +31,42 @@ object Categories {
 object ExtensionEntities {
     // Tin mới (category_id = 1)
     val tinMoi = listOf(
-        ExtensionEntity(
+        DefaultExtension(
             1,
             1,
             "Báo Tuổi trẻ",
             "https://statictuoitre.mediacdn.vn/web_images/favicon.ico",
             "https://tuoitre.vn/rss/tin-moi-nhat.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             2,
             1,
             "Báo Thanh Niên",
             "https://static.thanhnien.com.vn/thanhnien.vn/image/favicon.ico",
             "https://thanhnien.vn/rss/home.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             3,
             1,
             "Báo VnExpress",
             "https://s1.vnecdn.net/vnexpress/restruct/images/favicon.ico",
             "https://vnexpress.net/rss/tin-moi-nhat.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             4,
             1,
             "Báo Dân Trí",
             "https://dantri.com.vn/favicon.ico",
             "https://dantri.com.vn/rss/home.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             5,
             1,
             "Báo Pháp Luật",
             "https://static-cms-plo.epicdn.me/v4/web/styles/img/favicon.png",
             "https://plo.vn/rss/home.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             6,
             1,
             "Báo VietNamNet",
@@ -77,42 +77,42 @@ object ExtensionEntities {
 
     // Thế giới (category_id = 2)
     val theGioi = listOf(
-        ExtensionEntity(
+        DefaultExtension(
             7,
             2,
             "Báo Pháp Luật",
             "https://static-cms-plo.epicdn.me/v4/web/styles/img/favicon.png",
             "https://plo.vn/rss/quoc-te-8.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             8,
             2,
             "Báo Dân Trí",
             "https://dantri.com.vn/favicon.ico",
             "https://dantri.com.vn/rss/the-gioi.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             9,
             2,
             "Báo VnExpress",
             "https://s1.vnecdn.net/vnexpress/restruct/images/favicon.ico",
             "https://vnexpress.net/rss/the-gioi.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             10,
             2,
             "Báo Thanh Niên",
             "https://static.thanhnien.com.vn/thanhnien.vn/image/favicon.ico",
             "https://thanhnien.vn/rss/the-gioi.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             11,
             2,
             "Báo Tuổi trẻ",
             "https://statictuoitre.mediacdn.vn/web_images/favicon.ico",
             "https://tuoitre.vn/rss/the-gioi.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             12,
             2,
             "Báo VietNamNet",
@@ -123,35 +123,35 @@ object ExtensionEntities {
 
     // Kinh tế (category_id = 3)
     val kinhTe = listOf(
-        ExtensionEntity(
+        DefaultExtension(
             13,
             3,
             "Báo Thanh Niên",
             "https://static.thanhnien.com.vn/thanhnien.vn/image/favicon.ico",
             "https://thanhnien.vn/rss/kinh-te.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             14,
             3,
             "Báo VnExpress",
             "https://s1.vnecdn.net/vnexpress/restruct/images/favicon.ico",
             "https://vnexpress.net/rss/kinh-doanh.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             15,
             3,
             "Báo Dân Trí",
             "https://dantri.com.vn/favicon.ico",
             "https://dantri.com.vn/rss/kinh-doanh.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             16,
             3,
             "Báo Pháp Luật",
             "https://static-cms-plo.epicdn.me/v4/web/styles/img/favicon.png",
             "https://plo.vn/rss/kinh-te-13.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             17,
             3,
             "Báo VietNamNet",
@@ -162,28 +162,28 @@ object ExtensionEntities {
 
     // Đời sống (category_id = 4)
     val doiSong = listOf(
-        ExtensionEntity(
+        DefaultExtension(
             18,
             4,
             "Báo Tuổi trẻ",
             "https://statictuoitre.mediacdn.vn/web_images/favicon.ico",
             "https://tuoitre.vn/rss/nhip-song-tre.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             19,
             4,
             "Báo Thanh Niên",
             "https://static.thanhnien.com.vn/thanhnien.vn/image/favicon.ico",
             "https://thanhnien.vn/rss/doi-song.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             20,
             4,
             "Báo VnExpress",
             "https://s1.vnecdn.net/vnexpress/restruct/images/favicon.ico",
             "https://vnexpress.net/rss/gia-dinh.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             21,
             4,
             "Báo Dân Trí",
@@ -194,28 +194,28 @@ object ExtensionEntities {
 
     // Sức khỏe (category_id = 5)
     val sucKhoe = listOf(
-        ExtensionEntity(
+        DefaultExtension(
             22,
             5,
             "Báo Tuổi trẻ",
             "https://statictuoitre.mediacdn.vn/web_images/favicon.ico",
             "https://tuoitre.vn/rss/suc-khoe.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             23,
             5,
             "Báo Thanh Niên",
             "https://static.thanhnien.com.vn/thanhnien.vn/image/favicon.ico",
             "https://thanhnien.vn/rss/suc-khoe.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             24,
             5,
             "Báo VnExpress",
             "https://s1.vnecdn.net/vnexpress/restruct/images/favicon.ico",
             "https://vnexpress.net/rss/suc-khoe.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             25,
             5,
             "Báo Dân Trí",
@@ -226,14 +226,14 @@ object ExtensionEntities {
 
     // Văn hóa (category_id = 6)
     val vanHoa = listOf(
-        ExtensionEntity(
+        DefaultExtension(
             26,
             6,
             "Báo Tuổi trẻ",
             "https://statictuoitre.mediacdn.vn/web_images/favicon.ico",
             "https://tuoitre.vn/rss/van-hoa.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             27,
             6,
             "Báo Thanh Niên",
@@ -244,28 +244,28 @@ object ExtensionEntities {
 
     // Giải trí (category_id = 7)
     val giaiTri = listOf(
-        ExtensionEntity(
+        DefaultExtension(
             28,
             7,
             "Báo Tuổi trẻ",
             "https://statictuoitre.mediacdn.vn/web_images/favicon.ico",
             "https://tuoitre.vn/rss/giai-tri.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             29,
             7,
             "Báo Thanh Niên",
             "https://static.thanhnien.com.vn/thanhnien.vn/image/favicon.ico",
             "https://thanhnien.vn/rss/giai-tri.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             30,
             7,
             "Báo VnExpress",
             "https://s1.vnecdn.net/vnexpress/restruct/images/favicon.ico",
             "https://vnexpress.net/rss/suc-khoe.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             31,
             7,
             "Báo Dân Trí",
@@ -276,28 +276,28 @@ object ExtensionEntities {
 
     // Thể thao (category_id = 8)
     val theThao = listOf(
-        ExtensionEntity(
+        DefaultExtension(
             32,
             8,
             "Báo Tuổi trẻ",
             "https://statictuoitre.mediacdn.vn/web_images/favicon.ico",
             "https://tuoitre.vn/rss/the-thao.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             33,
             8,
             "Báo Thanh Niên",
             "https://static.thanhnien.com.vn/thanhnien.vn/image/favicon.ico",
             "https://thanhnien.vn/rss/the-thao.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             34,
             8,
             "Báo VnExpress",
             "https://s1.vnecdn.net/vnexpress/restruct/images/favicon.ico",
             "https://vnexpress.net/rss/the-thao.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             35,
             8,
             "Báo Dân Trí",
@@ -308,28 +308,28 @@ object ExtensionEntities {
 
     // Công nghệ (category_id = 9)
     val congNghe = listOf(
-        ExtensionEntity(
+        DefaultExtension(
             36,
             9,
             "Báo Tuổi trẻ",
             "https://statictuoitre.mediacdn.vn/web_images/favicon.ico",
             "https://tuoitre.vn/rss/nhip-song-so.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             37,
             9,
             "Báo Thanh Niên",
             "https://static.thanhnien.com.vn/thanhnien.vn/image/favicon.ico",
             "https://thanhnien.vn/rss/cong-nghe.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             38,
             9,
             "Báo VnExpress",
             "https://s1.vnecdn.net/vnexpress/restruct/images/favicon.ico",
             "https://vnexpress.net/rss/cong-nghe.rss"
         ),
-        ExtensionEntity(
+        DefaultExtension(
             39,
             9,
             "Báo Dân Trí",
@@ -339,7 +339,7 @@ object ExtensionEntities {
     )
 
 
-    fun getExtensionEntitiesByCategoryId(categoryId: Int): List<ExtensionEntity> {
+    fun getExtensionEntitiesByCategoryId(categoryId: Int): List<DefaultExtension> {
         return when (categoryId) {
             1 -> tinMoi
             2 -> theGioi

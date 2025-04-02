@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -19,11 +20,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.vnews.ui.screens.ArticleDetailScreen
 import com.example.vnews.ui.screens.CommunityScreen
+import com.example.vnews.ui.screens.ExtensionsScreen
 import com.example.vnews.ui.screens.HomeScreen
+import com.example.vnews.ui.screens.RepositoryScreen
 import com.example.vnews.ui.screens.SavedArticlesScreen
 import com.example.vnews.ui.screens.UserScreen
 import com.example.vnews.ui.screens.ViewedArticlesScreen
 import com.example.vnews.ui.viewmodel.ArticleViewModel
+import com.example.vnews.ui.viewmodel.ExtensionViewModel
+import com.example.vnews.ui.viewmodel.RepositoryViewModel
 import com.example.vnews.ui.viewmodel.RssViewModel
 
 sealed class Screen(
@@ -35,6 +40,12 @@ sealed class Screen(
         route = "home_graph",
         title = "Home",
         icon = { Icon(Icons.Default.Home, contentDescription = "Home") })
+
+    object Extension : Screen(
+        route = "extension",
+        title = "Extensions",
+        icon = { Icon(Icons.Default.Build, contentDescription = "extensions") }
+    )
 
     object Community : Screen(
         route = "community",
@@ -55,6 +66,8 @@ sealed class Screen(
     object SavedArticles : Screen("saved_articles")
 
     object ViewedArticles : Screen("viewed_articles")
+
+    object Repository : Screen("repository")
 }
 
 @Composable
@@ -68,9 +81,10 @@ fun NavGraph(navController: NavHostController) {
         }
 
         navigation(
+            route = "home_graph",
             startDestination = "home",
-            route = "home_graph"
-        ) {
+
+            ) {
             composable("home") { backStackEntry ->
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry("home_graph")
@@ -139,8 +153,30 @@ fun NavGraph(navController: NavHostController) {
                 )
             }
         }
+        navigation(
+            route = "extension_graph",
+            startDestination = Screen.Extension.route,
+        ) {
+            composable(route = Screen.Extension.route) { backStackEntry ->
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry("extension_graph")
+                }
+                val extensionViewModel = hiltViewModel<ExtensionViewModel>(parentEntry)
+                ExtensionsScreen(
+                    extensionViewModel = extensionViewModel,
+                    navController = navController
+                )
+            }
+            composable(route = Screen.Repository.route) { backStackEntry ->
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry("extension_graph")
+                }
+                val exRepositoryViewModel = hiltViewModel<RepositoryViewModel>(parentEntry)
+                RepositoryScreen(exRepositoryViewModel)
+            }
 
-        navigation(startDestination = "settings", route = "settings_graph") {
+        }
+        navigation(route = "settings_graph", startDestination = "settings") {
             composable(Screen.Settings.route) { UserScreen(navController) }
 
             composable(

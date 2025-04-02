@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.example.vnews.data.local.AppDatabase
 import com.example.vnews.data.local.dao.ArticleDao
+import com.example.vnews.data.local.dao.ExtensionDao
+import com.example.vnews.data.local.dao.RepoDao
 import com.example.vnews.data.local.dao.SavedArticleDao
 import com.example.vnews.data.local.dao.ViewedArticleDao
 import dagger.Module
@@ -45,5 +47,17 @@ object DatabaseModule {
     @Singleton
     fun provideSavedArticleDao(database: AppDatabase): SavedArticleDao {
         return database.savedArticleDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRepoDao(database: AppDatabase): RepoDao {
+        return database.repoDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideExtensionDao(database: AppDatabase): ExtensionDao {
+        return database.extensionDao()
     }
 }
