@@ -2,6 +2,7 @@ package com.example.vnews.ui.screens
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,8 +20,12 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.filled.TextFormat
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,20 +37,39 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.vnews.data.model.ArticleItem
 import com.example.vnews.ui.viewmodel.ArticleViewModel
 import com.example.vnews.utils.DateTimeUtil
 import com.example.vnews.utils.TextToSpeechUtil
+
+// Text size presets
+enum class TextSizePreset(val size: Float) {
+    SMALL(14f),
+    MEDIUM(16f),
+    LARGE(18f)
+}
+
+// Font family presets
+enum class FontPreset(val fontFamily: FontFamily) {
+    DEFAULT(FontFamily.Default),
+    ROBOTO(FontFamily.SansSerif),
+    GEORGIA(FontFamily.Serif),
+    COURIER(FontFamily.Monospace)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,6 +85,12 @@ fun ArticleDetailScreen(
     
     val textToSpeechUtil = remember { TextToSpeechUtil(context) }
     val isSpeaking by textToSpeechUtil.isSpeaking.collectAsState()
+
+    // Text customization state
+    var selectedTextSize by remember { mutableStateOf(TextSizePreset.MEDIUM) }
+    var selectedFontFamily by remember { mutableStateOf(FontPreset.DEFAULT) }
+    var showFontMenu by remember { mutableStateOf(false) }
+    var showTextSizeMenu by remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -81,6 +111,22 @@ fun ArticleDetailScreen(
                     }
                 },
                 actions = {
+                    IconButton(
+                        onClick = { showTextSizeMenu = !showTextSizeMenu }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.TextFormat,
+                            contentDescription = "Text Size"
+                        )
+                    }
+                    IconButton(
+                        onClick = { showFontMenu = !showFontMenu }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.TextFields,
+                            contentDescription = "Font Family"
+                        )
+                    }
                     IconButton(
                         onClick = {
                             if (isSpeaking) {
@@ -126,115 +172,223 @@ fun ArticleDetailScreen(
             )
         }
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AsyncImage(
-                        model = selectedArticle!!.extensionIcon,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .padding(end = 8.dp)
-                    )
-                    Text(
-                        text = selectedArticle!!.extensionName,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-
-            item {
-                Text(
-                    text = selectedArticle!!.title,
-                    style = MaterialTheme.typography.headlineMedium,
-                    textAlign = TextAlign.Start
-                )
-            }
-
-            item {
-                Text(
-                    text = DateTimeUtil.getRelativeTime(selectedArticle!!.pubTime),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            item {
-                Text(
-                    text = selectedArticle!!.summary,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
-            if (isLoading) {
+        Box {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
                 item {
-                    Box(
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        CircularProgressIndicator()
+                        AsyncImage(
+                            model = selectedArticle!!.extensionIcon,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(24.dp)
+                                .padding(end = 8.dp)
+                        )
+                        Text(
+                            text = selectedArticle!!.extensionName,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
-            } else {
-                items(articleContent?.items ?: emptyList()) { item ->
-                    when (item) {
-                        is ArticleItem.Text -> {
-                            Text(
-                                text = item.content,
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
 
-                        is ArticleItem.Image -> {
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current)
-                                        .data(item.url)
-                                        .crossfade(true)
-                                        .build(),
-                                    contentDescription = item.caption,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clip(RoundedCornerShape(12.dp)),
-                                    contentScale = ContentScale.Crop
+                item {
+                    Text(
+                        text = selectedArticle!!.title,
+                        style = MaterialTheme.typography.headlineMedium,
+                        textAlign = TextAlign.Start
+                    )
+                }
+
+                item {
+                    Text(
+                        text = DateTimeUtil.getRelativeTime(selectedArticle!!.pubTime),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                item {
+                    Text(
+                        text = selectedArticle!!.summary,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = selectedTextSize.size.sp,
+                            fontFamily = selectedFontFamily.fontFamily
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                if (isLoading) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                } else {
+                    items(articleContent?.items ?: emptyList()) { item ->
+                        when (item) {
+                            is ArticleItem.Text -> {
+                                Text(
+                                    text = item.content,
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontSize = selectedTextSize.size.sp,
+                                        fontFamily = selectedFontFamily.fontFamily
+                                    ),
+                                    modifier = Modifier.fillMaxWidth()
                                 )
-                                if (item.caption.isNotEmpty()) {
-                                    Text(
-                                        text = item.caption,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                            }
+
+                            is ArticleItem.Image -> {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    AsyncImage(
+                                        model = ImageRequest.Builder(LocalContext.current)
+                                            .data(item.url)
+                                            .crossfade(true)
+                                            .build(),
+                                        contentDescription = item.caption,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(RoundedCornerShape(12.dp)),
+                                        contentScale = ContentScale.Crop
                                     )
+                                    if (item.caption.isNotEmpty()) {
+                                        Text(
+                                            text = item.caption,
+                                            style = MaterialTheme.typography.bodySmall.copy(
+                                                fontSize = selectedTextSize.size.sp,
+                                                fontFamily = selectedFontFamily.fontFamily
+                                            ),
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
+
+                item {
+                    Button(
+                        onClick = {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(selectedArticle!!.source))
+                            context.startActivity(intent)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Read Full Article")
+                    }
+                }
             }
 
-            item {
-                Button(
-                    onClick = {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(selectedArticle!!.source))
-                        context.startActivity(intent)
-                    },
-                    modifier = Modifier.fillMaxWidth()
+            // Text Size Menu
+            if (showTextSizeMenu) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.TopEnd)
                 ) {
-                    Text("Read Full Article")
+                    Column(
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.surface)
+                            .padding(16.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                    ) {
+                        Text("Text Size")
+                        DropdownMenu(
+                            expanded = showTextSizeMenu,
+                            onDismissRequest = { showTextSizeMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Small") },
+                                onClick = {
+                                    selectedTextSize = TextSizePreset.SMALL
+                                    showTextSizeMenu = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Medium") },
+                                onClick = {
+                                    selectedTextSize = TextSizePreset.MEDIUM
+                                    showTextSizeMenu = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Large") },
+                                onClick = {
+                                    selectedTextSize = TextSizePreset.LARGE
+                                    showTextSizeMenu = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Font Family Menu
+            if (showFontMenu) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.TopEnd)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.surface)
+                            .padding(16.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                    ) {
+                        Text("Font Family")
+                        DropdownMenu(
+                            expanded = showFontMenu,
+                            onDismissRequest = { showFontMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Default") },
+                                onClick = {
+                                    selectedFontFamily = FontPreset.DEFAULT
+                                    showFontMenu = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Roboto") },
+                                onClick = {
+                                    selectedFontFamily = FontPreset.ROBOTO
+                                    showFontMenu = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Georgia") },
+                                onClick = {
+                                    selectedFontFamily = FontPreset.GEORGIA
+                                    showFontMenu = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Courier") },
+                                onClick = {
+                                    selectedFontFamily = FontPreset.COURIER
+                                    showFontMenu = false
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
