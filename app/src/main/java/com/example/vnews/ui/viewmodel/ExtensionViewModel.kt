@@ -10,12 +10,17 @@ import com.example.vnews.data.remote.dto.RssSource
 import com.example.vnews.data.remote.dto.toExtensionEntity
 import com.example.vnews.data.repository.ExtRepoRepository
 import com.example.vnews.data.repository.ExtensionRepository
+import com.example.vnews.utils.DateTimeUtil
+import com.prof18.rssparser.RssParser
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
 import javax.inject.Inject
 
 
@@ -38,6 +43,16 @@ class ExtensionViewModel @Inject constructor(
     private val _allExtension = MutableStateFlow<List<RssSource>>(emptyList())
     val allExtension = _allExtension.asStateFlow()
 
+    private val _selectedExtension = MutableStateFlow<ExtensionEntity?>(null)
+    val selectedExtension = _selectedExtension.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
+    private val _extensionArticles = MutableStateFlow<List<RssItem>>(emptyList())
+    val extensionArticles = _extensionArticles.asStateFlow()
+
+    private val rssParser = RssParser()
 
     init {
         observeInstalled()
@@ -82,19 +97,61 @@ class ExtensionViewModel @Inject constructor(
     fun addExtension(rss: RssSource) {
         viewModelScope.launch {
             extRepo.installExtension(rss.toExtensionEntity())
-            observeInstalled() // Cập nhật danh sách sau khi thêm
+            observeInstalled()
         }
     }
 
     fun deleteExtension(ext: ExtensionEntity) {
         viewModelScope.launch {
             extRepo.deleteInstalledExt(ext)
-            observeInstalled() // Cập nhật danh sách sau khi xóa
+            observeInstalled()
         }
     }
 
     fun setSelectedTab(tab: String) {
         _selectedTab.value = tab
+    }
+
+    fun setSelectedExtension(extension: ExtensionEntity) {
+        _selectedExtension.value = extension
+        fetchExtensionArticles(extension)
+    }
+
+    private fun fetchExtensionArticles(extension: ExtensionEntity) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                withContext(Dispatchers.IO) {
+                    try {
+                        val channel = rssParser.getRssChannel(extension.source)
+                        
+                        val items = channel.items.map { item ->
+                            RssItem(
+                                title = Jsoup.parse(item.title ?: "").text()
+                                    .replace("&apos;", "'"),
+                                summary = Jsoup.parse(item.description ?: "").text(),
+                                source = item.link ?: "",
+                                pubTime = DateTimeUtil.parseDateToUnix(item.pubDate ?: ""),
+                                thumbnail = item.image ?: "",
+                                extensionName = extension.name,
+                                extensionIcon = extension.icon
+                            )
+                        }
+                        
+                        val sortedItems = items.sortedByDescending { it.pubTime }
+                        _extensionArticles.value = sortedItems
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        _extensionArticles.value = emptyList()
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _extensionArticles.value = emptyList()
+            } finally {
+                _isLoading.value = false
+            }
+        }
     }
 }
 

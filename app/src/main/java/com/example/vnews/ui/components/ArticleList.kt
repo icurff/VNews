@@ -31,8 +31,7 @@ import com.example.vnews.ui.navigation.Screen
 import com.example.vnews.ui.viewmodel.ArticleViewModel
 import com.example.vnews.ui.viewmodel.RssItem
 import com.example.vnews.utils.DateTimeUtil
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
+import com.example.vnews.utils.StringUtils
 
 @Composable
 fun ArticleList(
@@ -73,7 +72,7 @@ fun handleArticleItemCardClick(
     navController: NavController
 ) {
     articleViewModel.setSelectedArticle(item)
-    val encodedUrl = URLEncoder.encode(item.source, StandardCharsets.UTF_8.toString())
+    val encodedUrl = StringUtils.encodeUrl(item.source)
     navController.navigate(Screen.ArticleDetail.createRoute(encodedUrl))
 }
 

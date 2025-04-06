@@ -26,6 +26,7 @@ import com.example.vnews.ui.screens.RepositoryScreen
 import com.example.vnews.ui.screens.SavedArticlesScreen
 import com.example.vnews.ui.screens.UserScreen
 import com.example.vnews.ui.screens.ViewedArticlesScreen
+import com.example.vnews.ui.screens.ExtensionDetailScreen
 import com.example.vnews.ui.viewmodel.ArticleViewModel
 import com.example.vnews.ui.viewmodel.ExtensionViewModel
 import com.example.vnews.ui.viewmodel.RepositoryViewModel
@@ -61,6 +62,10 @@ sealed class Screen(
 
     object ArticleDetail : Screen("article/{articleSource}") {
         fun createRoute(articleSource: String) = "article/$articleSource"
+    }
+
+    object ExtensionDetail : Screen("extension/{extensionSource}") {
+        fun createRoute(extensionSource: String) = "extension/$extensionSource"
     }
 
     object SavedArticles : Screen("saved_articles")
@@ -174,7 +179,72 @@ fun NavGraph(navController: NavHostController) {
                 val exRepositoryViewModel = hiltViewModel<RepositoryViewModel>(parentEntry)
                 RepositoryScreen(exRepositoryViewModel)
             }
+            composable(route = Screen.ExtensionDetail.route) { backStackEntry ->
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry("extension_graph")
+                }
+                val extensionViewModel = hiltViewModel<ExtensionViewModel>(parentEntry)
+                val articleViewModel = hiltViewModel<ArticleViewModel>(parentEntry)
+                ExtensionDetailScreen(
+                    extensionViewModel = extensionViewModel,
+                    articleViewModel = articleViewModel,
+                    navController = navController,
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+            composable(
+                route = Screen.ArticleDetail.route,
+                enterTransition = {
+                    fadeIn(
+                        animationSpec = tween(
+                            durationMillis = 300, easing = FastOutSlowInEasing
+                        )
+                    ) + slideIntoContainer(
+                        animationSpec = tween(300, easing = FastOutSlowInEasing),
+                        towards = AnimatedContentTransitionScope.SlideDirection.Start
+                    )
+                },
+                exitTransition = {
+                    fadeOut(
+                        animationSpec = tween(
+                            durationMillis = 300, easing = FastOutSlowInEasing
+                        )
+                    ) + slideOutOfContainer(
+                        animationSpec = tween(300, easing = FastOutSlowInEasing),
+                        towards = AnimatedContentTransitionScope.SlideDirection.Start
+                    )
+                },
+                popEnterTransition = {
+                    fadeIn(
+                        animationSpec = tween(
+                            300, easing = FastOutSlowInEasing
+                        )
+                    ) + slideIntoContainer(
+                        animationSpec = tween(300, easing = FastOutSlowInEasing),
+                        towards = AnimatedContentTransitionScope.SlideDirection.End
+                    )
+                },
+                popExitTransition = {
+                    fadeOut(
+                        animationSpec = tween(
+                            300, easing = FastOutSlowInEasing
+                        )
+                    ) + slideOutOfContainer(
+                        animationSpec = tween(300, easing = FastOutSlowInEasing),
+                        towards = AnimatedContentTransitionScope.SlideDirection.End
+                    )
+                }
+            ) { backStackEntry ->
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry("extension_graph")
+                }
+                val articleViewModel = hiltViewModel<ArticleViewModel>(parentEntry)
 
+                ArticleDetailScreen(
+                    articleViewModel = articleViewModel,
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
         }
         navigation(route = "settings_graph", startDestination = "settings") {
             composable(Screen.Settings.route) { UserScreen(navController) }

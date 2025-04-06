@@ -37,8 +37,7 @@ import com.example.vnews.ui.viewmodel.ArticleViewModel
 import com.example.vnews.ui.viewmodel.RssItem
 import com.example.vnews.ui.viewmodel.RssViewModel
 import com.example.vnews.utils.DateTimeUtil
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
+import com.example.vnews.utils.StringUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +50,7 @@ fun RssFeedList(
 ) {
     val rssItems by rssViewModel.rssItems.collectAsState()
     val isLoading by rssViewModel.isLoading.collectAsState()
-    val isRefreshing by rssViewModel.isRefreshing.collectAsState()
+//    val isRefreshing by rssViewModel.isRefreshing.collectAsState()
     val itemsList = rssItems[categoryId] ?: emptyList()
 
 
@@ -93,7 +92,7 @@ fun handleRssItemCardClick(
     navController: NavController
 ) {
     articleViewModel.setSelectedArticle(item)
-    val encodedUrl = URLEncoder.encode(item.source, StandardCharsets.UTF_8.toString())
+    val encodedUrl = StringUtils.encodeUrl(item.source)
     navController.navigate(Screen.ArticleDetail.createRoute(encodedUrl))
 }
 

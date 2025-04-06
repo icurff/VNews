@@ -1,4 +1,4 @@
-package com.example.vnews.ui.viewmodel
+    package com.example.vnews.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -8,16 +8,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -50,6 +48,7 @@ import com.example.vnews.data.remote.dto.RssSource
 import com.example.vnews.ui.navigation.Screen
 import com.example.vnews.ui.viewmodel.ExtensionUiState
 import com.example.vnews.ui.viewmodel.ExtensionViewModel
+import com.example.vnews.utils.StringUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -183,11 +182,9 @@ fun Library(extensionViewModel: ExtensionViewModel) {
 
         is ExtensionUiState.Success -> {
             val exts = (uiState as ExtensionUiState.Success).extensions
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+            LazyColumn(
                 contentPadding = PaddingValues(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(exts) { extension ->
@@ -216,11 +213,9 @@ fun Library(extensionViewModel: ExtensionViewModel) {
 fun Installed(extensionViewModel: ExtensionViewModel, navController: NavController) {
     val installedExts by extensionViewModel.installed.collectAsState()
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
+    LazyColumn(
         contentPadding = PaddingValues(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.fillMaxSize()
     ) {
         items(installedExts) { extension ->
@@ -228,8 +223,9 @@ fun Installed(extensionViewModel: ExtensionViewModel, navController: NavControll
                 extension = extension,
                 onDelete = { extensionViewModel.deleteExtension(extension) },
                 onClick = {
-//                    extensionViewModel.setSelectedExtension(extension)
-//                    navController.navigate(Screen.ExtensionDetail.createRoute(extension.link))
+                    extensionViewModel.setSelectedExtension(extension)
+                    val encodedUrl = StringUtils.encodeUrl(extension.source)
+                    navController.navigate(Screen.ExtensionDetail.createRoute(encodedUrl))
                 }
             )
         }
@@ -246,7 +242,6 @@ fun ExtensionItem(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1f)
     ) {
         Row(
             modifier = Modifier
@@ -258,7 +253,7 @@ fun ExtensionItem(
                 model = extension.icon,
                 contentDescription = extension.name,
                 modifier = Modifier
-                    .size(64.dp)
+                    .size(48.dp)
                     .padding(8.dp),
                 contentScale = ContentScale.Fit
             )
@@ -269,7 +264,10 @@ fun ExtensionItem(
                 Text(
                     text = extension.name,
                     style = MaterialTheme.typography.titleMedium,
-                    maxLines = 2
+                )
+                Text(
+                    text = extension.source,
+                    style = MaterialTheme.typography.labelSmall,
                 )
             }
 
@@ -293,7 +291,6 @@ fun InstalledItem(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1f)
     ) {
         Row(
             modifier = Modifier
@@ -305,7 +302,7 @@ fun InstalledItem(
                 model = extension.icon,
                 contentDescription = extension.name,
                 modifier = Modifier
-                    .size(64.dp)
+                    .size(48.dp)
                     .padding(8.dp),
                 contentScale = ContentScale.Fit
             )
@@ -316,7 +313,10 @@ fun InstalledItem(
                 Text(
                     text = extension.name,
                     style = MaterialTheme.typography.titleMedium,
-                    maxLines = 2
+                )
+                Text(
+                    text = extension.source,
+                    style = MaterialTheme.typography.labelSmall,
                 )
             }
 
