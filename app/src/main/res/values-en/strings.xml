@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VNews</string>
+    
+    <!-- User Screen -->
+    <string name="user_title">Người dùng</string>
+    <string name="back">Quay lại</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="dark_mode">Chế độ tối</string>
+    <string name="language">Ngôn ngữ</string>
+    <string name="english">Tiếng Anh</string>
+    <string name="vietnamese">Tiếng Việt</string>
+    <string name="saved_articles">Bài viết đã lưu</string>
+    <string name="viewed_articles">Bài viết đã xem</string>
+    <string name="follow_facebook">Theo dõi Facebook</string>
+    <string name="login_with_google">Đăng nhập bằng Google</string>
+    
+    <!-- App Sections -->
+    <string name="app_section">Ứng dụng</string>
+    <string name="connection_section">Kết nối</string>
+</resources> 

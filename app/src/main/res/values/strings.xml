@@ -2,4 +2,21 @@
 <resources>
     <string name="app_name">VNews</string>
     <string name="default_web_client_id">899795293611-lcauiuqpasiustkkplgirnvncmktrf8e.apps.googleusercontent.com</string>
+    
+    <!-- User Screen -->
+    <string name="user_title">Cá Nhân</string>
+    <string name="back">Back</string>
+    <string name="logout">Log out</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="language">Language</string>
+    <string name="english">English</string>
+    <string name="vietnamese">Tiếng Việt</string>
+    <string name="saved_articles">Saved Articles</string>
+    <string name="viewed_articles">Viewed Articles</string>
+    <string name="follow_facebook">Follow Facebook page</string>
+    <string name="login_with_google">Login with Google</string>
+    
+    <!-- App Sections -->
+    <string name="app_section">App</string>
+    <string name="connection_section">Connection</string>
 </resources>

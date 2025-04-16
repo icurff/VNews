@@ -9,4 +9,5 @@ data class RepositoryEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val sourceName: String,
     val source: String,
+    val isDefault: Boolean = false,
 )

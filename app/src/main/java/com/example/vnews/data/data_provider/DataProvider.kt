@@ -45,29 +45,29 @@ object ExtensionEntities {
             "https://static.thanhnien.com.vn/thanhnien.vn/image/favicon.ico",
             "https://thanhnien.vn/rss/home.rss"
         ),
+//        DefaultExtension(
+//            3,
+//            1,
+//            "Báo VnExpress",
+//            "https://s1.vnecdn.net/vnexpress/restruct/images/favicon.ico",
+//            "https://vnexpress.net/rss/tin-moi-nhat.rss"
+//        ),
         DefaultExtension(
             3,
-            1,
-            "Báo VnExpress",
-            "https://s1.vnecdn.net/vnexpress/restruct/images/favicon.ico",
-            "https://vnexpress.net/rss/tin-moi-nhat.rss"
-        ),
-        DefaultExtension(
-            4,
             1,
             "Báo Dân Trí",
             "https://dantri.com.vn/favicon.ico",
             "https://dantri.com.vn/rss/home.rss"
         ),
         DefaultExtension(
-            5,
+            4,
             1,
             "Báo Pháp Luật",
             "https://static-cms-plo.epicdn.me/v4/web/styles/img/favicon.png",
             "https://plo.vn/rss/home.rss"
         ),
         DefaultExtension(
-            6,
+            5,
             1,
             "Báo VietNamNet",
             "https://static.vnncdn.net/ico/favicon.ico",

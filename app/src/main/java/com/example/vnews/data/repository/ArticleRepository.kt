@@ -6,7 +6,7 @@ import com.example.vnews.data.local.dao.ViewedArticleDao
 import com.example.vnews.data.local.entity.ArticleEntity
 import com.example.vnews.data.local.entity.SavedArticleEntity
 import com.example.vnews.data.local.entity.ViewedArticleEntity
-import com.example.vnews.ui.viewmodel.RssItem
+import com.example.vnews.ui.home.RssItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
