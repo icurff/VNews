@@ -565,30 +565,6 @@ fun ArticleDetailScreen(
                                     }
                                     .padding(16.dp)
                             ) {
-//                                Column {
-//                                    Text(
-//                                        text = "Summarized by AI",
-//                                        style = MaterialTheme.typography.titleMedium,
-//                                        color = MaterialTheme.colorScheme.primary
-//                                    )
-//
-//                                    if (isSummarizing) {
-//                                        Box(
-//                                            modifier = Modifier
-//                                                .fillMaxWidth()
-//                                                .padding(vertical = 16.dp),
-//                                            contentAlignment = Alignment.Center
-//                                        ) {
-//                                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
-//                                        }
-//                                    } else if (articleSummary?.isNotEmpty() == true) {
-//                                        Text(
-//                                            text = articleSummary!!,
-//                                            style = MaterialTheme.typography.bodyMedium,
-//                                            modifier = Modifier.padding(top = 8.dp)
-//                                        )
-//                                    }
-//                                }
                                 Column {
                                     if (isSummarizing) {
                                         Column(

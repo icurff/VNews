@@ -52,6 +52,8 @@ dependencies {
     implementation("androidx.media3:media3-common:1.6.1")
     implementation("androidx.media3:media3-session:1.6.1")
 
+    implementation("androidx.work:work-runtime-ktx:2.10.1")
+
     implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
 
     implementation("com.google.firebase:firebase-auth")
@@ -63,7 +65,8 @@ dependencies {
 
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
-    implementation("androidx.browser:browser:1.9.0-alpha02")
+    implementation("androidx.browser:browser:1.9.0-alpha01")
+
     implementation("androidx.recyclerview:recyclerview:1.4.0")
 
 

@@ -1,4 +1,4 @@
-package com.example.vnews.ui.components
+package com.example.vnews.ui.community.component
 
 import android.Manifest
 import android.net.Uri
@@ -50,7 +50,6 @@ import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -70,39 +69,31 @@ fun BottomChatBar() {
     var isUploading by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    
+
     // Create SpeechRecognitionUtil instance
     val speechRecognitionUtil = remember { SpeechRecognitionUtil(context) }
     val isListening by speechRecognitionUtil.isListening.collectAsState()
     val speechText by speechRecognitionUtil.speechText.collectAsState()
-    val speechError by speechRecognitionUtil.error.collectAsState()
-    
+
     // Permission state
     var showPermissionRequest by remember { mutableStateOf(false) }
-    
+
     // Image picker
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         selectedImageUri = uri
     }
-    
-    // Show error toast if needed
-    LaunchedEffect(speechError) {
-        speechError?.let { errorMessage ->
-            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
-        }
-    }
-    
+
     // Update message text with speech recognition results
     LaunchedEffect(speechText) {
         if (speechText.isNotEmpty()) {
             messageText = speechText
         }
     }
-    
+
     // Clean up resources when component is disposed
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_DESTROY) {
@@ -116,7 +107,7 @@ fun BottomChatBar() {
         }
     }
 
-    // Handle permission request if needed
+    // Handle permission request
     if (showPermissionRequest) {
         PermissionManager.RequestPermission(
             permission = Manifest.permission.RECORD_AUDIO,
@@ -138,8 +129,8 @@ fun BottomChatBar() {
     val db = FirebaseFirestore.getInstance()
     val auth = FirebaseAuth.getInstance()
     val currentUser = auth.currentUser
-    
-    // Function to send a message with optional image
+
+    // Function to send a message
     val sendMessage = { imageUrl: String? ->
         if ((messageText.isNotBlank() || imageUrl != null) && currentUser != null) {
             scope.launch {
@@ -149,12 +140,12 @@ fun BottomChatBar() {
                     "senderName" to (currentUser.displayName ?: "Guest"),
                     "timestamp" to FieldValue.serverTimestamp()
                 )
-                
+
                 // Add image URL if present
                 if (imageUrl != null) {
                     messageData["imageUrl"] = imageUrl
                 }
-                
+
                 db.collection("messages").add(messageData)
                 messageText = ""
                 selectedImageUri = null
@@ -164,7 +155,7 @@ fun BottomChatBar() {
             isUploading = false
         }
     }
-    
+
     Column(
         modifier = Modifier.padding(
             bottom = WindowInsets.navigationBars
@@ -178,7 +169,7 @@ fun BottomChatBar() {
                 .height(0.5.dp)
                 .background(Gray)
         )
-        
+
         // Selected image preview
         if (selectedImageUri != null) {
             Row(
@@ -199,17 +190,13 @@ fun BottomChatBar() {
                         modifier = Modifier.fillMaxWidth(),
                         contentScale = ContentScale.Crop
                     )
-                    
+
                     // Close button to remove the image
                     IconButton(
                         onClick = { selectedImageUri = null },
                         modifier = Modifier
                             .size(24.dp)
                             .align(Alignment.TopEnd)
-                            .background(
-                                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
-                                shape = RoundedCornerShape(4.dp)
-                            )
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
@@ -219,9 +206,9 @@ fun BottomChatBar() {
                         )
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.width(8.dp))
-                
+
                 Text(
                     text = "Image selected",
                     style = MaterialTheme.typography.bodySmall,
@@ -248,7 +235,7 @@ fun BottomChatBar() {
                     focusedContainerColor = Color.Transparent
                 )
             )
-            
+
             // Image picker button
             IconButton(
                 onClick = {
@@ -273,12 +260,6 @@ fun BottomChatBar() {
                         speechRecognitionUtil.stopListening()
                     } else {
                         if (SpeechRecognitionUtil.hasRecordAudioPermission(context)) {
-                            // Show feedback immediately for better UX
-                            Toast.makeText(
-                                context, 
-                                "Starting Vietnamese speech recognition...", 
-                                Toast.LENGTH_SHORT
-                            ).show()
                             speechRecognitionUtil.startListening("vi-VN")
                         } else {
                             showPermissionRequest = true
@@ -307,21 +288,24 @@ fun BottomChatBar() {
                     )
                 }
             } else {
-                IconButton(onClick = {
-                    if (selectedImageUri != null) {
-                        isUploading = true
-                        scope.launch {
-                            val imageUrl = ImageUtils.uploadImage(context, selectedImageUri!!)
-                            sendMessage(imageUrl)
+                IconButton(
+                    onClick = {
+                        if (selectedImageUri != null) {
+                            isUploading = true
+                            scope.launch {
+                                val imageUrl = ImageUtils.uploadImage(context, selectedImageUri!!)
+                                sendMessage(imageUrl)
+                            }
+                        } else {
+                            sendMessage(null)
                         }
-                    } else {
-                        sendMessage(null)
-                    }
-                }, enabled = (messageText.isNotBlank() || selectedImageUri != null) && !isUploading) {
+                    },
+                    enabled = (messageText.isNotBlank() || selectedImageUri != null) && !isUploading
+                ) {
                     Icon(
                         Icons.AutoMirrored.Outlined.Send,
                         contentDescription = "Send",
-                        tint = if (messageText.isNotBlank() || selectedImageUri != null) 
+                        tint = if (messageText.isNotBlank() || selectedImageUri != null)
                             MaterialTheme.colorScheme.primary else Gray
                     )
                 }

@@ -151,9 +151,7 @@ class TextToSpeechUtil(
         // Sync with ViewModel
         viewModel?.updateTtsItemIndex(index)
 
-
         connectToMediaService()
-
 
         // Start tts
         textToSpeech?.speak(

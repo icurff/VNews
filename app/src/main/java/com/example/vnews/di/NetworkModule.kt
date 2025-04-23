@@ -18,7 +18,6 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideRetrofit(): Retrofit {
-
         return Retrofit.Builder()
             .baseUrl("https://raw.githubusercontent.com")
             .addConverterFactory(
@@ -35,10 +34,5 @@ object NetworkModule {
         return retrofit.create(RepoApiService::class.java)
     }
 
-//    @Provides
-//    @Singleton
-//    fun provideExtensionApiService(retrofit: Retrofit): ExtensionApiService {
-//        return retrofit.create(ExtensionApiService::class.java)
-//    }
 
 }

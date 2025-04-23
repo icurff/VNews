@@ -57,27 +57,18 @@ fun BottomCommentBar(encodedArticlePath: String) {
     val speechRecognitionUtil = remember { SpeechRecognitionUtil(context) }
     val isListening by speechRecognitionUtil.isListening.collectAsState()
     val speechText by speechRecognitionUtil.speechText.collectAsState()
-    val speechError by speechRecognitionUtil.error.collectAsState()
     
     // Permission state
     var showPermissionRequest by remember { mutableStateOf(false) }
-    
-    // Show error toast if needed
-    LaunchedEffect(speechError) {
-        speechError?.let { errorMessage ->
-            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
-        }
-    }
-    
-    // Update comment text with speech recognition results
+
     LaunchedEffect(speechText) {
         if (speechText.isNotEmpty()) {
             commentText = speechText
         }
     }
     
-    // Clean up resources when component is disposed
-    val lifecycleOwner = LocalLifecycleOwner.current
+    // Clean up resources
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_DESTROY) {
@@ -146,7 +137,7 @@ fun BottomCommentBar(encodedArticlePath: String) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Listening for Vietnamese...",
+                        text = "Listening...",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.weight(1f)
@@ -182,12 +173,6 @@ fun BottomCommentBar(encodedArticlePath: String) {
                             speechRecognitionUtil.stopListening()
                         } else {
                             if (SpeechRecognitionUtil.hasRecordAudioPermission(context)) {
-                                // Show feedback immediately for better UX
-                                Toast.makeText(
-                                    context, 
-                                    "Starting Vietnamese speech recognition...", 
-                                    Toast.LENGTH_SHORT
-                                ).show()
                                 speechRecognitionUtil.startListening("vi-VN")
                             } else {
                                 showPermissionRequest = true

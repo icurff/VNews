@@ -25,7 +25,6 @@ object Categories {
         CategoryEntity(8, "Thể thao"),
         CategoryEntity(9, "Công nghệ")
     )
-
 }
 
 object ExtensionEntities {

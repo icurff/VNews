@@ -1,7 +1,6 @@
 package com.example.vnews.data.remote.dto
 
 
-
 import com.example.vnews.data.local.entity.ExtensionEntity
 import kotlinx.serialization.Serializable
 

@@ -1,4 +1,4 @@
-package com.example.vnews.network
+package com.example.vnews.service
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
@@ -14,7 +14,7 @@ import retrofit2.http.Part
 import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
-// API Response data classes
+// API Response
 data class ImgBBResponse(
     val data: ImgBBData,
     val success: Boolean,
@@ -56,7 +56,6 @@ interface ImgBBApiService {
     ): Response<ImgBBResponse>
 }
 
-// Singleton object to provide the API service
 object ImgBBApi {
     private const val BASE_URL = "https://api.imgbb.com/"
 

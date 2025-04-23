@@ -7,9 +7,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.widget.RemoteViews
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.vnews.MainActivity
 import com.example.vnews.R
 import com.example.vnews.data.data_provider.DefaultExtension
@@ -27,8 +28,6 @@ import java.util.concurrent.TimeUnit
 class LatestArticleWidget : AppWidgetProvider() {
     
     private val widgetCoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-    private val updateHandler = Handler(Looper.getMainLooper())
-    private val updateInterval = TimeUnit.MINUTES.toMillis(5) // 5 minutes
 
     companion object {
         private const val ACTION_REFRESH = "com.example.vnews.ACTION_WIDGET_REFRESH"
@@ -36,7 +35,7 @@ class LatestArticleWidget : AppWidgetProvider() {
         private const val ACTION_PREVIOUS = "com.example.vnews.ACTION_WIDGET_PREVIOUS"
         private const val CURRENT_ARTICLE_INDEX = "current_article_index"
         private const val MAX_ARTICLES = 5
-        
+        private const val UPDATE_INTERVAL_MINUTES = 15 * 60 * 1000L
 
         private val NEWS_SOURCES = ExtensionEntities.tinMoi
 
@@ -60,6 +59,18 @@ class LatestArticleWidget : AppWidgetProvider() {
             }
             
             context.sendBroadcast(intent)
+        }
+
+        fun scheduleWidgetUpdates(context: Context) {
+            val updateRequest = PeriodicWorkRequestBuilder<WidgetUpdateWorker>(
+                UPDATE_INTERVAL_MINUTES, TimeUnit.MINUTES
+            ).build()
+            
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+                WidgetUpdateWorker.WIDGET_WORK_NAME,
+                ExistingPeriodicWorkPolicy.UPDATE,
+                updateRequest
+            )
         }
     }
 
@@ -124,25 +135,10 @@ class LatestArticleWidget : AppWidgetProvider() {
             }
         }
         
-        scheduleNextUpdate(context)
+        // Schedule periodic updates using WorkManager
+        scheduleWidgetUpdates(context)
     }
-    
-    private fun scheduleNextUpdate(context: Context) {
-        updateHandler.removeCallbacksAndMessages(null)
-        updateHandler.postDelayed({
-            val appWidgetManager = AppWidgetManager.getInstance(context)
-            val appWidgetIds = appWidgetManager.getAppWidgetIds(
-                ComponentName(context, LatestArticleWidget::class.java)
-            )
-            fetchArticles(context, appWidgetManager, appWidgetIds)
-        }, updateInterval)
-    }
-    
-    override fun onDisabled(context: Context) {
-        super.onDisabled(context)
-        updateHandler.removeCallbacksAndMessages(null)
-    }
-    
+
     private fun fetchArticles(
         context: Context,
         appWidgetManager: AppWidgetManager,

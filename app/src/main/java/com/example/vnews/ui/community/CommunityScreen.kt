@@ -32,7 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.vnews.ui.components.BottomChatBar
+import com.example.vnews.ui.community.component.BottomChatBar
 import com.example.vnews.ui.components.MessageItem
 import com.example.vnews.ui.user_setting.UserViewModel
 import kotlinx.coroutines.launch
@@ -49,7 +49,7 @@ fun CommunityScreen(
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    // Improved auto-scroll when new messages arrive
+    //scroll to latest mess
     LaunchedEffect(messages) {
         if (messages.isNotEmpty()) {
             coroutineScope.launch {
@@ -59,14 +59,13 @@ fun CommunityScreen(
                         scrollOffset = 0
                     )
                 } catch (e: Exception) {
-                    // Fallback to instant scroll if animation fails
                     listState.scrollToItem(messages.size - 1)
                 }
             }
         }
     }
 
-    // Add scroll to bottom when user sends a message
+    // scroll to bottom when user sends a message
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             try {

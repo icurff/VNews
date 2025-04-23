@@ -12,7 +12,6 @@ object WebScraper {
             val doc = Jsoup.connect(url).get()
             val items = mutableListOf<ArticleItem>()
 
-            // Chọn nội dung chính
             val content = doc.selectFirst("article.fck_detail")
                 ?: doc.selectFirst("div.detail-content")
                 ?: doc.selectFirst("div.article__body")
