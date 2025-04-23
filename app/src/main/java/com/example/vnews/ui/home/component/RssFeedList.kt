@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,6 +43,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.vnews.ui.article.ArticleViewModel
@@ -57,7 +59,7 @@ import kotlinx.coroutines.launch
 fun RssFeedList(
     rssViewModel: RssViewModel,
     articleViewModel: ArticleViewModel,
-    categoryId: Int,
+    categoryId: Int?,
     modifier: Modifier = Modifier,
     navController: NavController,
     searchQuery: String? = null
@@ -65,7 +67,14 @@ fun RssFeedList(
     val rssItems by rssViewModel.rssItems.collectAsState()
     val isLoading by rssViewModel.isLoading.collectAsState()
 //    val isRefreshing by rssViewModel.isRefreshing.collectAsState()
-    val itemsList = rssItems[categoryId] ?: emptyList()
+
+    // If categoryId is null, get items from all categories for global search
+    val itemsList = if (categoryId != null) {
+        rssItems[categoryId] ?: emptyList()
+    } else {
+        // Combine items from all categories
+        rssItems.values.flatten()
+    }
 
     val filteredItems = if (!searchQuery.isNullOrBlank()) {
         itemsList.filter { item ->
@@ -75,9 +84,6 @@ fun RssFeedList(
     } else {
         itemsList
     }
-
-
-
 
     if (isLoading) {
         Box(
@@ -97,7 +103,7 @@ fun RssFeedList(
             LazyColumn(
                 modifier = modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 items(filteredItems) { item ->
                     RssItemCard(
@@ -109,7 +115,6 @@ fun RssFeedList(
         }
     }
 }
-
 
 fun handleRssItemCardClick(
     item: RssItem,
@@ -172,16 +177,12 @@ private fun RssItemCard(
         }
     }
 
-
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onTap = {
-                        onClick()
-                    },
+                    onTap = { onClick() },
                     onLongPress = {
                         scope.launch {
                             showEditSheet = true
@@ -191,65 +192,68 @@ private fun RssItemCard(
                 )
             }
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(8.dp)
         ) {
-            Text(
-                text = item.title,
-                style = MaterialTheme.typography.titleLarge,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(8.dp))
             AsyncImage(
                 model = item.thumbnail,
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp)), contentScale = ContentScale.Crop
+                    .size(100.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
-            Text(
-                text = item.summary,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 4,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(100.dp)
             ) {
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AsyncImage(
-                        model = item.extensionIcon,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .padding(end = 8.dp)
-                    )
-                    Text(
-                        text = item.extensionName,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-
-                }
+                // Title
                 Text(
-                    text = DateTimeUtil.getRelativeTime(item.pubTime),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = item.title,
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp),
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
                 )
-            }
 
+                Spacer(modifier = Modifier.weight(1f))
+
+                // Info row
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AsyncImage(
+                            model = item.extensionIcon,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(18.dp)
+                                .padding(end = 4.dp)
+                        )
+                        Text(
+                            text = item.extensionName,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    Text(
+                        text = DateTimeUtil.getRelativeTime(item.pubTime),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
 
         }
     }

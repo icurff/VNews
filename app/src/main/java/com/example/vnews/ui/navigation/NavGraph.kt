@@ -1,10 +1,14 @@
 package com.example.vnews.ui.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -24,6 +28,8 @@ import com.example.vnews.ui.extension_source.ExtensionSourceScreen
 import com.example.vnews.ui.extension_source.ExtensionSourceViewModel
 import com.example.vnews.ui.home.HomeScreen
 import com.example.vnews.ui.home.RssViewModel
+import com.example.vnews.ui.community.CommunityScreen
+import com.example.vnews.ui.search.SearchScreen
 import com.example.vnews.ui.user_setting.UserScreen
 
 sealed class Screen(
@@ -42,14 +48,11 @@ sealed class Screen(
         icon = { Icon(Icons.Default.Build, contentDescription = "extensions") }
     )
 
-//    object Community : Screen(
-//        route = "community",
-//        title = "Community",
-//        icon = { Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Settings") }
-//    )
-
-    @OptIn(ExperimentalMaterial3Api::class)
-
+    object Community : Screen(
+        route = "community",
+        title = "Community",
+        icon = { Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Settings") }
+    )
 
     object Settings : Screen(
         route = "settings",
@@ -69,6 +72,8 @@ sealed class Screen(
 
     object ViewedArticles : Screen("viewed_articles")
 
+    object Search : Screen("search")
+
     object Repository : Screen("repository")
 }
 
@@ -79,10 +84,58 @@ fun NavGraph(
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route,
+        enterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(700)
+            ) + fadeIn(animationSpec = tween(700))
+        },
+        exitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(700)
+            ) + fadeOut(animationSpec = tween(700))
+        },
+        popEnterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(700)
+            ) + fadeIn(animationSpec = tween(700))
+        },
+        popExitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(700)
+            ) + fadeOut(animationSpec = tween(700))
+        }
     ) {
-//        composable(Screen.Community.route) {
-//            CommunityScreen(navController)
-//        }
+        composable(route = Screen.Community.route,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(700)
+                ) + fadeIn(animationSpec = tween(700))
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(700)
+                ) + fadeOut(animationSpec = tween(700))
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(700)
+                ) + fadeIn(animationSpec = tween(700))
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(700)
+                ) + fadeOut(animationSpec = tween(700))
+            }) {
+            CommunityScreen(navController)
+        }
 
         navigation(
             route = "home_graph",
@@ -105,6 +158,30 @@ fun NavGraph(
 
             composable(
                 route = Screen.ArticleDetail.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                }
             ) { backStackEntry ->
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry("home_graph")
@@ -116,12 +193,78 @@ fun NavGraph(
                     onBackClick = { navController.popBackStack() }
                 )
             }
+
+            composable(
+                route = Screen.Search.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                }
+            ) { backStackEntry ->
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry("home_graph")
+                }
+                val rssViewModel = hiltViewModel<RssViewModel>(parentEntry)
+                val articleViewModel = hiltViewModel<ArticleViewModel>(parentEntry)
+
+                SearchScreen(
+                    rssViewModel = rssViewModel,
+                    articleViewModel = articleViewModel,
+                    navController = navController
+                )
+            }
         }
         navigation(
             route = "extension_graph",
             startDestination = Screen.Extension.route,
         ) {
-            composable(route = Screen.Extension.route) { backStackEntry ->
+            composable(
+                route = Screen.Extension.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                }
+            ) { backStackEntry ->
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry("extension_graph")
                 }
@@ -131,14 +274,66 @@ fun NavGraph(
                     navController = navController
                 )
             }
-            composable(route = Screen.Repository.route) { backStackEntry ->
+            composable(
+                route = Screen.Repository.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                }
+            ) { backStackEntry ->
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry("extension_graph")
                 }
                 val extensionSourceViewModel = hiltViewModel<ExtensionSourceViewModel>(parentEntry)
                 ExtensionSourceScreen(extensionSourceViewModel)
             }
-            composable(route = Screen.ExtensionDetail.route) { backStackEntry ->
+            composable(
+                route = Screen.ExtensionDetail.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                }
+            ) { backStackEntry ->
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry("extension_graph")
                 }
@@ -153,6 +348,30 @@ fun NavGraph(
             }
             composable(
                 route = Screen.ArticleDetail.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                }
             ) { backStackEntry ->
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry("extension_graph")
@@ -166,10 +385,60 @@ fun NavGraph(
             }
         }
         navigation(route = "settings_graph", startDestination = "settings") {
-            composable(Screen.Settings.route) { UserScreen(navController) }
+            composable(
+                route = Screen.Settings.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                }
+            ) { UserScreen(navController) }
 
             composable(
                 route = Screen.SavedArticles.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                }
             ) { backStackEntry ->
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry("settings_graph")
@@ -185,6 +454,30 @@ fun NavGraph(
 
             composable(
                 route = Screen.ViewedArticles.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                }
             ) { backStackEntry ->
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry("settings_graph")
@@ -200,6 +493,30 @@ fun NavGraph(
 
             composable(
                 route = Screen.ArticleDetail.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeIn(animationSpec = tween(700))
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(700)
+                    ) + fadeOut(animationSpec = tween(700))
+                }
             ) { backStackEntry ->
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry("settings_graph")

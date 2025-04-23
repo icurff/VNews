@@ -18,7 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.example.vnews.ui.shared_component.ArticleList
+import com.example.vnews.ui.article.component.ArticleList
 import com.example.vnews.ui.article.ArticleViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

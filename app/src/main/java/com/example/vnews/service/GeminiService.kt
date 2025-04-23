@@ -8,7 +8,7 @@ import javax.inject.Singleton
 
 @Singleton
 class GeminiService @Inject constructor() {
-    private val apiKey = "HIDDENT API KEY"
+    private val apiKey = "secretkey"
 
     private val generativeModel by lazy {
 
@@ -23,12 +23,16 @@ class GeminiService @Inject constructor() {
         return withContext(Dispatchers.IO) {
             try {
                 val prompt = """
-                    Bạn là trợ lý AI chuyên tóm tắt nội dung báo chí. Hãy tóm tắt bài báo này thành 3-5 điểm chính,
-                    mỗi điểm không quá 2 câu. Hãy giữ tông trung lập và tập trung vào thông tin quan trọng nhất.
-
-                    Tiêu đề: $title
-
-                    Nội dung: $content
+Bạn là một trợ lý AI có chuyên môn trong việc tóm tắt nội dung báo chí cho độc giả bận rộn.
+Hãy phân tích và tóm tắt bài báo sau thành 3–5 ý chính, mỗi ý ngắn gọn, rõ ràng (tối đa 2 câu).
+Yêu cầu quan trọng:
+Giữ giọng văn trung lập, không cảm tính
+Tập trung vào sự kiện, số liệu, nhân vật, địa điểm, thời gian, diễn biến chính
+Không nêu lại tiêu đề, không đưa quan điểm cá nhân
+Nếu có thông tin mơ hồ, ưu tiên diễn đạt khách quan thay vì suy diễn
+Sử dụng ngôn ngữ phổ thông, dễ hiểu, tránh thuật ngữ chuyên ngành nếu không cần thiết
+Tiêu đề: $title
+Nội dung: $content
                 """.trimIndent()
 
                 val response = generativeModel.generateContent(prompt)

@@ -7,15 +7,15 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
-import android.util.Log
-import androidx.media3.common.util.UnstableApi
 import com.example.vnews.ui.article.ArticleViewModel
+import com.example.vnews.utils.MediaNotificationConstants.ACTION_STOP
+import com.example.vnews.utils.MediaNotificationConstants.EXTRA_ARTICLE_TITLE
+import com.example.vnews.utils.MediaNotificationConstants.EXTRA_CONTENT_TITLE
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.json.JsonNull.content
 import java.util.Locale
 
 
-@UnstableApi
 class TextToSpeechUtil(
     private val context: Context,
     private val viewModel: ArticleViewModel? = null
@@ -24,7 +24,6 @@ class TextToSpeechUtil(
     private val _isSpeaking = MutableStateFlow(false)
 
     private val _isPaused = MutableStateFlow(false)
-    val isPaused: StateFlow<Boolean> = _isPaused
 
     private val _isInitialized = MutableStateFlow(false)
 
@@ -32,28 +31,27 @@ class TextToSpeechUtil(
 
     private val _speechRate = MutableStateFlow(1.0f)
 
-    // Store content items for navigation
+    // Store contents of article
     private var contentItems = listOf<String>()
 
-    // Media notification service
     private var mediaNotificationService: MediaNotificationService? = null
-    private var isServiceConnected = false
+    
+    // Flag to track service binding state
+    private var isServiceBound = false
 
     // Service connection object
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as MediaNotificationService.LocalBinder
             mediaNotificationService = binder.getService()
-            isServiceConnected = true
             mediaNotificationService?.setMediaControlCallback(this@TextToSpeechUtil)
-
-            // Initial update of media info and state
-            updateMediaInfo()
+            isServiceBound = true
+            updateNotification()
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
             mediaNotificationService = null
-            isServiceConnected = false
+            isServiceBound = false
         }
     }
 
@@ -61,8 +59,6 @@ class TextToSpeechUtil(
         const val MIN_SPEECH_RATE = 0.5f
         const val MAX_SPEECH_RATE = 2.0f
         const val SPEECH_RATE_STEP = 0.25f
-        const val DEFAULT_SPEECH_RATE = 1.0f
-        private const val TAG = "TextToSpeechUtil"
     }
 
     init {
@@ -80,25 +76,15 @@ class TextToSpeechUtil(
 
         textToSpeech?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {
-
                 _isSpeaking.value = true
-                _isPaused.value = false
 
-                // Sync state with ViewModel
                 syncStateWithViewModel()
 
                 if (utteranceId?.startsWith("article_item_") == true) {
                     val indexStr = utteranceId.removePrefix("article_item_")
                     val index = indexStr.toIntOrNull() ?: -1
-                    if (index >= 0 && index < contentItems.size) {
-                        // Set current item index
-                        _currentItemIndex.value = index
-
-
-                        // Sync with ViewModel
-                        viewModel?.updateTtsItemIndex(index)
-
-                    }
+                    _currentItemIndex.value = index
+                    viewModel?.updateTtsItemIndex(index)
                 }
             }
 
@@ -110,27 +96,24 @@ class TextToSpeechUtil(
                     if (index >= 0 && index < contentItems.size - 1) {
                         playContentItem(index + 1)
                     } else {
-                        _isSpeaking.value = false
-                        _isPaused.value = false
-                        _currentItemIndex.value = -1
-
-                        // Sync with ViewModel
-                        syncStateWithViewModel()
+                        clearStates()
                     }
                 }
             }
 
             override fun onError(utteranceId: String?) {
-                _isSpeaking.value = false
-                _isPaused.value = false
-                Log.e(TAG, "Error in synthesis: $utteranceId")
-                _currentItemIndex.value = -1
-
-                // Sync with ViewModel
-                syncStateWithViewModel()
+                clearStates()
             }
 
         })
+    }
+
+    private fun clearStates() {
+        _isSpeaking.value = false
+        _isPaused.value = false
+        _currentItemIndex.value = -1
+
+        syncStateWithViewModel()
     }
 
     private fun syncStateWithViewModel() {
@@ -141,7 +124,7 @@ class TextToSpeechUtil(
             speechRate = _speechRate.value
         )
 
-        updateMediaInfo()
+        updateNotification()
     }
 
     fun setContentItems(items: List<String>) {
@@ -150,7 +133,7 @@ class TextToSpeechUtil(
 
 
     private fun connectToMediaService() {
-        if (!isServiceConnected) {
+        if (!isServiceBound) {
             val intent = Intent(context, MediaNotificationService::class.java)
             context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
         }
@@ -168,9 +151,9 @@ class TextToSpeechUtil(
         // Sync with ViewModel
         viewModel?.updateTtsItemIndex(index)
 
-        if (!isServiceConnected) {
-            connectToMediaService()
-        }
+
+        connectToMediaService()
+
 
         // Start tts
         textToSpeech?.speak(
@@ -193,18 +176,12 @@ class TextToSpeechUtil(
     private fun startMediaNotificationService() {
         if (_isSpeaking.value && !_isPaused.value) {
             val articleTitle = viewModel?.selectedArticle?.value?.title ?: "VNews"
-            val contentTitle =
-                if (_currentItemIndex.value >= 0 && _currentItemIndex.value < contentItems.size) {
-                    val content = contentItems[_currentItemIndex.value]
-                    if (content.length > 30) content.substring(0, 30) + "..." else content
-                } else "Text-to-Speech"
-            //   val thumbnailUrl = viewModel?.selectedArticle?.value?.thumbnail
+            val contentTitle =if (content.length > 30) content.substring(0, 30) + "..." else content
 
             val intent = Intent(context, MediaNotificationService::class.java)
-            intent.putExtra(MediaNotificationService.EXTRA_ARTICLE_TITLE, articleTitle)
-            intent.putExtra(MediaNotificationService.EXTRA_CONTENT_TITLE, contentTitle)
+            intent.putExtra(EXTRA_ARTICLE_TITLE, articleTitle)
+            intent.putExtra(EXTRA_CONTENT_TITLE, contentTitle)
             context.startService(intent)
-
         }
     }
 
@@ -234,6 +211,7 @@ class TextToSpeechUtil(
     }
 
     fun pause() {
+
         if (!_isSpeaking.value || _isPaused.value) return
 
         textToSpeech?.stop()
@@ -241,20 +219,13 @@ class TextToSpeechUtil(
         _isPaused.value = true
         _isSpeaking.value = false
 
-        // Sync with ViewModel
         syncStateWithViewModel()
-
-        updateMediaInfo()
 
     }
 
     fun resume() {
         if (!_isPaused.value || _currentItemIndex.value < 0) return
-
-        if (!isServiceConnected) {
-            connectToMediaService()
-        }
-
+        connectToMediaService()
         val currentIndex = _currentItemIndex.value
         val text = contentItems[currentIndex]
 
@@ -264,14 +235,10 @@ class TextToSpeechUtil(
             null,
             "article_item_$currentIndex"
         )
-
         _isSpeaking.value = true
         _isPaused.value = false
 
-        // Sync with ViewModel
         syncStateWithViewModel()
-
-        updateMediaInfo()
 
     }
 
@@ -292,21 +259,23 @@ class TextToSpeechUtil(
         )
 
         removeNotification()
-
     }
 
     private fun removeNotification() {
-
         val intent = Intent(context, MediaNotificationService::class.java)
-        intent.action = MediaNotificationService.ACTION_STOP
+        intent.action = ACTION_STOP
         context.startService(intent)
 
-        if (isServiceConnected) {
-            context.unbindService(serviceConnection)
-            isServiceConnected = false
-            mediaNotificationService = null
+        if (isServiceBound) {
+            try {
+                context.unbindService(serviceConnection)
+                isServiceBound = false
+            } catch (e: IllegalArgumentException) {
+                isServiceBound = false
+            }
         }
-
+        
+        mediaNotificationService = null
     }
 
 
@@ -343,29 +312,23 @@ class TextToSpeechUtil(
         stop()
     }
 
-    fun isPaused(): Boolean {
-        return _isPaused.value
-    }
-
-    private fun updateMediaInfo() {
-        if (!isServiceConnected || mediaNotificationService == null) return
-
-        val articleTitle = if (_currentItemIndex.value == 0 && contentItems.isNotEmpty()) {
-            contentItems[0]
-        } else {
-            viewModel?.selectedArticle?.value?.title ?: "VNews"
-        }
-
-        val contentTitle =
-            if (_currentItemIndex.value >= 0 && _currentItemIndex.value < contentItems.size) {
-                val content = contentItems[_currentItemIndex.value]
-                if (content.length > 30) content.substring(0, 30) + "..." else content
-            } else {
-                "Text-to-Speech"
-            }
-
+    private fun updateNotification() {
+        if (mediaNotificationService == null) return
+        
+        // Ensure we have content items before accessing them
+        if (contentItems.isEmpty()) return
+        
+        val articleTitle = contentItems.firstOrNull() ?: ""
+        val currentContentItem = if (_currentItemIndex.value >= 0 && _currentItemIndex.value < contentItems.size) {
+            contentItems[_currentItemIndex.value]
+        } else ""
+        
+        val contentTitle = if (currentContentItem.length > 30) 
+            currentContentItem.substring(0, 30) + "..." 
+        else 
+            currentContentItem
+            
         val thumbnailUrl = viewModel?.selectedArticle?.value?.thumbnail
-
         mediaNotificationService?.updateMediaInfo(articleTitle, contentTitle, thumbnailUrl)
 
         mediaNotificationService?.updatePlaybackState(

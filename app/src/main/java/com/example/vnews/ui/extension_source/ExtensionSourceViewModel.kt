@@ -23,6 +23,9 @@ class ExtensionSourceViewModel @Inject constructor(
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
+    
+    private val _successMessage = MutableStateFlow<String?>(null)
+    val successMessage: StateFlow<String?> = _successMessage.asStateFlow()
 
     init {
         observeRepositories()
@@ -42,6 +45,7 @@ class ExtensionSourceViewModel @Inject constructor(
             try {
                 repoRepository.addRepo(repoName,sourceUrl)
                 _error.value = null
+                _successMessage.value = "Repository added successfully"
             } catch (e: Exception) {
                 _error.value = "Failed to add repository: ${e.message}"
             } finally {
@@ -55,9 +59,30 @@ class ExtensionSourceViewModel @Inject constructor(
             try {
                 repoRepository.deleteRepo(repository)
                 _error.value = null
+                _successMessage.value = "Repository deleted successfully"
             } catch (e: Exception) {
                 _error.value = "Failed to delete repository: ${e.message}"
             }
         }
+    }
+
+    fun updateRepository(repository: RepositoryEntity, newName: String, newUrl: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val updatedRepo = repository.copy(sourceName = newName, source = newUrl)
+                repoRepository.updateRepo(updatedRepo)
+                _error.value = null
+                _successMessage.value = "Repository updated successfully"
+            } catch (e: Exception) {
+                _error.value = "Failed to update repository: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun clearSuccessMessage() {
+        _successMessage.value = null
     }
 } 

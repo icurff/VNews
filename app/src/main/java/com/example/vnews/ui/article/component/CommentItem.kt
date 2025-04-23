@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -97,12 +98,12 @@ fun CommentItem(
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(top = 4.dp)
             )
-            Spacer(
+            HorizontalDivider(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp)
-                    .height(0.5.dp)
-                    .background(Gray)
+                    .padding(vertical = 16.dp),
+                thickness = 0.5.dp,
+                color = Gray
             )
         }
     }

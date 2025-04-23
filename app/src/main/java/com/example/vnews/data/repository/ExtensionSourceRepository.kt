@@ -27,4 +27,10 @@ class ExtensionSourceRepository @Inject constructor(
             repoDao.deleteRepo(repo)
         }
     }
+
+    suspend fun updateRepo(repo: RepositoryEntity) {
+        withContext(Dispatchers.IO) {
+            repoDao.updateRepo(repo)
+        }
+    }
 }

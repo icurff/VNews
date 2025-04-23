@@ -19,4 +19,7 @@
     <!-- App Sections -->
     <string name="app_section">App</string>
     <string name="connection_section">Connection</string>
+    
+    <!-- Widget -->
+    <string name="latest_article_widget_description" translatable="false">Displays the latest news article on your home screen</string>
 </resources>

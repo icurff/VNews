@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.vnews.data.local.entity.RepositoryEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -19,5 +20,6 @@ interface RepoDao {
     @Delete
     suspend fun deleteRepo(repo: RepositoryEntity)
 
-
+    @Update
+    suspend fun updateRepo(repo: RepositoryEntity)
 } 

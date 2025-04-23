@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     
     <application
         android:name=".VNewsApplication"
@@ -21,10 +24,10 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.VNews">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -33,6 +36,21 @@
             android:name=".utils.MediaNotificationService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
+            
+        <!-- Widget Provider -->
+        <receiver
+            android:name=".widget.LatestArticleWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.example.vnews.ACTION_WIDGET_REFRESH" />
+                <action android:name="com.example.vnews.ACTION_WIDGET_NEXT" />
+                <action android:name="com.example.vnews.ACTION_WIDGET_PREVIOUS" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/latest_article_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

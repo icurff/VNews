@@ -1,16 +1,19 @@
 package com.example.vnews.ui.shared_component
 
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.vnews.ui.navigation.Screen
 
-val bottomNavItems = listOf(Screen.Home,Screen.Extension, Screen.Settings)
+val bottomNavItems = listOf(Screen.Home, Screen.Extension,Screen.Community, Screen.Settings)
 
 @Composable
 fun BottomNavBar(navController: NavController) {
@@ -18,9 +21,12 @@ fun BottomNavBar(navController: NavController) {
     val currentRoute = navBackStackEntry?.destination?.route
     val parentRoute = navBackStackEntry?.destination?.parent?.route
 
-    NavigationBar {
+    NavigationBar(
+        modifier = Modifier.defaultMinSize(minHeight = 70.dp)
+    ) {
         bottomNavItems.forEach { screen ->
             NavigationBarItem(
+                modifier = Modifier.defaultMinSize(minHeight = 70.dp),
                 icon = { screen.icon?.invoke() },
                 label = { Text(screen.title) },
                 selected = when (screen) {

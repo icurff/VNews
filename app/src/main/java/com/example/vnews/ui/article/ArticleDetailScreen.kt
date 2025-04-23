@@ -12,18 +12,24 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -32,21 +38,23 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Summarize
-import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.TextFormat
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -60,18 +68,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.vnews.R
 import com.example.vnews.data.model.ArticleItem
 import com.example.vnews.ui.article.component.AudioController
 import com.example.vnews.ui.article.component.BottomCommentBar
@@ -84,9 +98,12 @@ import kotlinx.coroutines.launch
 
 // Text size presets
 enum class TextSizePreset(val size: Float) {
-    SMALL(14f),
-    MEDIUM(16f),
-    LARGE(18f)
+    EXTRA_SMALL(10f),
+    SMALL(12f),
+    MEDIUM(14f),
+    LARGE(16f),
+    EXTRA_LARGE(18f),
+    HUGE(20f)
 }
 
 // Font family presets
@@ -97,7 +114,7 @@ enum class FontPreset(val fontFamily: FontFamily) {
     COURIER(FontFamily.Monospace)
 }
 
-@androidx.annotation.OptIn(UnstableApi::class)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleDetailScreen(
@@ -110,19 +127,15 @@ fun ArticleDetailScreen(
     val isLoading by articleViewModel.isLoading.collectAsState()
     val isArticleSaved by articleViewModel.isSaved.collectAsState()
 
-    // Text customization state
+    // Text customization states
     var selectedTextSize by remember { mutableStateOf(TextSizePreset.MEDIUM) }
     var selectedFontFamily by remember { mutableStateOf(FontPreset.DEFAULT) }
 
-    val fontSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showFontMenu by remember { mutableStateOf(false) }
-
-    val textSizeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showTextSizeMenu by remember { mutableStateOf(false) }
+    val fontCustomizationSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showFontCustomizationSheet by remember { mutableStateOf(false) }
 
     val commentSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showCommentsSheet by remember { mutableStateOf(false) }
-
 
     val speedSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSpeedControlSheet by remember { mutableStateOf(false) }
@@ -186,6 +199,48 @@ fun ArticleDetailScreen(
     }
 
     Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        AsyncImage(
+                            model = selectedArticle?.extensionIcon,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(24.dp)
+                                .padding(end = 8.dp)
+                        )
+                        Text(
+                            text = selectedArticle?.extensionName ?: "Unknown Source",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = handleBackClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { showFontCustomizationSheet = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.TextFormat,
+                            contentDescription = "Text Settings"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
+            )
+        },
         bottomBar = {
             if (selectedArticle != null && articleContent != null) {
                 AnimatedVisibility(
@@ -203,6 +258,11 @@ fun ArticleDetailScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp)
+                            .padding(
+                                bottom = WindowInsets.navigationBars
+                                    .asPaddingValues()
+                                    .calculateBottomPadding()
+                            )
                             .clip(RoundedCornerShape(16.dp)),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
@@ -222,26 +282,7 @@ fun ArticleDetailScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            IconButton(
-                                onClick = { showTextSizeMenu = !showTextSizeMenu },
-                                modifier = Modifier.size(36.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.TextFormat,
-                                    contentDescription = "Text Size",
-                                    modifier = Modifier.size(28.dp)
-                                )
-                            }
-                            IconButton(
-                                onClick = { showFontMenu = !showFontMenu },
-                                modifier = Modifier.size(36.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.TextFields,
-                                    contentDescription = "Font Family",
-                                    modifier = Modifier.size(28.dp)
-                                )
-                            }
+                            // TTS service
                             IconButton(
                                 onClick = {
                                     showMenuBar = false
@@ -260,6 +301,7 @@ fun ArticleDetailScreen(
                                     modifier = Modifier.size(28.dp)
                                 )
                             }
+                            // Comment Sheet
                             BadgedBox(
                                 badge = {
                                     if (comments.isNotEmpty()) {
@@ -289,6 +331,7 @@ fun ArticleDetailScreen(
                                     )
                                 }
                             }
+                            // Save Article
                             IconButton(
                                 onClick = {
                                     if (isArticleSaved) {
@@ -305,11 +348,37 @@ fun ArticleDetailScreen(
                                     modifier = Modifier.size(28.dp)
                                 )
                             }
+                            // Share Icon
+                            IconButton(
+                                onClick = {
+                                    val shareIntent = Intent().apply {
+                                        action = Intent.ACTION_SEND
+                                        putExtra(
+                                            Intent.EXTRA_TEXT,
+                                            "${selectedArticle!!.title}\n\nRead more at: ${selectedArticle!!.source}"
+                                        )
+                                        type = "text/plain"
+                                    }
+                                    context.startActivity(
+                                        Intent.createChooser(
+                                            shareIntent,
+                                            "Share Article"
+                                        )
+                                    )
+                                },
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Share,
+                                    contentDescription = "Share",
+                                    modifier = Modifier.size(28.dp)
+                                )
+                            }
                         }
                     }
                 }
 
-                // Audio Controller - now only shows when showAudioController is true
+                // Audio Controller
                 AnimatedVisibility(
                     visible = (isSpeaking || isPaused) && showAudioController,
                     enter = fadeIn(animationSpec = tween(300)) + slideInVertically(
@@ -352,7 +421,6 @@ fun ArticleDetailScreen(
                             textToSpeechUtil.stop()
                         },
                         onShowSpeedControl = {
-                            // Pause playback when opening speed control
                             if (isSpeaking && !isPaused) {
                                 textToSpeechUtil.pause()
                             }
@@ -374,7 +442,6 @@ fun ArticleDetailScreen(
                             maxSpeed = TextToSpeechUtil.MAX_SPEECH_RATE,
                             step = TextToSpeechUtil.SPEECH_RATE_STEP,
                             onSpeedChange = { newRate ->
-                                // Set the speech rate directly
                                 textToSpeechUtil.setSpeechRate(newRate)
                             },
                             onDismiss = {
@@ -388,56 +455,36 @@ fun ArticleDetailScreen(
                 }
             }
         }
-    ) { padding ->
+    ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .clickable {
-                    if (isSpeaking || isPaused) {
-                        // Toggle audio controller visibility
-                        showAudioController = !showAudioController
-                    } else {
-                        // Toggle menu bar
-                        showMenuBar = !showMenuBar
+                .padding(innerPadding)
+                .pointerInput(Unit) {
+                    detectTapGestures {
+                        if (isSpeaking || isPaused) {
+                            showAudioController = !showAudioController
+                        } else {
+                            showMenuBar = !showMenuBar
+                        }
                     }
                 }
         ) {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        AsyncImage(
-                            model = selectedArticle!!.extensionIcon,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(24.dp)
-                                .padding(end = 8.dp)
-                        )
-                        Text(
-                            text = selectedArticle!!.extensionName,
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-
+                // Article Title
                 item {
                     Text(
-                        text = selectedArticle!!.title,
+                        text = selectedArticle?.title ?: "",
                         style = MaterialTheme.typography.headlineMedium,
                         textAlign = TextAlign.Start,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
+                            .padding(top = 8.dp)
                             .background(
                                 if (currentTtsItemIndex == 0) MaterialTheme.colorScheme.primaryContainer.copy(
                                     alpha = 0.5f
@@ -448,7 +495,7 @@ fun ArticleDetailScreen(
                             .padding(if (currentTtsItemIndex == 0) 8.dp else 0.dp)
                     )
                 }
-
+                // Article Pub time
                 item {
                     Row(
                         modifier = Modifier
@@ -458,7 +505,7 @@ fun ArticleDetailScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = DateTimeUtil.getRelativeTime(selectedArticle!!.pubTime),
+                            text = DateTimeUtil.getRelativeTime(selectedArticle?.pubTime ?: 0),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -472,14 +519,21 @@ fun ArticleDetailScreen(
                                 }
                             }
                         ) {
-                            Icon(
-                                imageVector = if (articleSummary?.isNotEmpty() == true) Icons.Filled.Close else Icons.Filled.Summarize,
-                                contentDescription = if (articleSummary?.isNotEmpty() == true) "Đóng tóm tắt" else "Tóm tắt"
-                            )
+                            if (articleSummary?.isNotEmpty() == true) {
+                                Icon(
+                                    imageVector = Icons.Filled.Close,
+                                    contentDescription = "Đóng tóm tắt"
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.ai_chip_icon),
+                                    contentDescription = "Tóm tắt"
+                                )
+                            }
                         }
                     }
                 }
-
+                // summarize with AI
                 if (isSummarizing || articleSummary?.isNotEmpty() == true) {
                     item {
                         AnimatedVisibility(
@@ -487,28 +541,76 @@ fun ArticleDetailScreen(
                             enter = fadeIn() + expandVertically(),
                             exit = fadeOut() + shrinkVertically()
                         ) {
-                            OutlinedCard(
-                                modifier = Modifier.fillMaxWidth()
+                            val borderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                                    .drawBehind {
+                                        drawRoundRect(
+                                            color = borderColor,
+                                            style = Stroke(
+                                                width = 2f,
+                                                pathEffect = PathEffect.dashPathEffect(
+                                                    floatArrayOf(
+                                                        10f,
+                                                        10f
+                                                    ), 0f
+                                                )
+                                            ),
+                                            cornerRadius = androidx.compose.ui.geometry.CornerRadius(
+                                                12.dp.toPx()
+                                            )
+                                        )
+                                    }
+                                    .padding(16.dp)
                             ) {
-                                Column(
-                                    modifier = Modifier.padding(16.dp)
-                                ) {
-                                    Text(
-                                        text = "Summaried by AI",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-
+//                                Column {
+//                                    Text(
+//                                        text = "Summarized by AI",
+//                                        style = MaterialTheme.typography.titleMedium,
+//                                        color = MaterialTheme.colorScheme.primary
+//                                    )
+//
+//                                    if (isSummarizing) {
+//                                        Box(
+//                                            modifier = Modifier
+//                                                .fillMaxWidth()
+//                                                .padding(vertical = 16.dp),
+//                                            contentAlignment = Alignment.Center
+//                                        ) {
+//                                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+//                                        }
+//                                    } else if (articleSummary?.isNotEmpty() == true) {
+//                                        Text(
+//                                            text = articleSummary!!,
+//                                            style = MaterialTheme.typography.bodyMedium,
+//                                            modifier = Modifier.padding(top = 8.dp)
+//                                        )
+//                                    }
+//                                }
+                                Column {
                                     if (isSummarizing) {
-                                        Box(
+                                        Column(
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(vertical = 16.dp),
-                                            contentAlignment = Alignment.Center
+                                            horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
+                                            Text(
+                                                text = "Summarizing...",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                            Spacer(modifier = Modifier.height(8.dp))
                                             CircularProgressIndicator(modifier = Modifier.size(24.dp))
                                         }
                                     } else if (articleSummary?.isNotEmpty() == true) {
+                                        Text(
+                                            text = "Summarized by AI",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
                                         Text(
                                             text = articleSummary!!,
                                             style = MaterialTheme.typography.bodyMedium,
@@ -516,14 +618,15 @@ fun ArticleDetailScreen(
                                         )
                                     }
                                 }
+
                             }
                         }
                     }
                 }
-
+                // Article Lead
                 item {
                     Text(
-                        text = selectedArticle!!.summary,
+                        text = selectedArticle?.summary ?: "",
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontSize = selectedTextSize.size.sp,
                             fontFamily = selectedFontFamily.fontFamily
@@ -542,6 +645,7 @@ fun ArticleDetailScreen(
                     )
                 }
 
+                // Article Contents
                 if (isLoading) {
                     item {
                         Box(
@@ -555,7 +659,8 @@ fun ArticleDetailScreen(
                     }
                 } else {
 
-                    val textContentToIndexMap = mutableMapOf<String, Int>()
+                    val textContentToIndexMap =
+                        mutableMapOf<String, Int>() // map store article contents and its indices
                     var indexCounter = 2 // Start from 2 as title is 0 and summary is 1
 
                     articleContent?.items?.forEach { item ->
@@ -622,104 +727,155 @@ fun ArticleDetailScreen(
                         }
                     }
                 }
-
+                // Read Full Button
                 item {
                     Button(
                         onClick = {
-                            val intent =
-                                Intent(Intent.ACTION_VIEW, Uri.parse(selectedArticle!!.source))
+                            val source = selectedArticle?.source ?: return@Button
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(source))
                             context.startActivity(intent)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp)
                     ) {
-                        Text("Read Full Article")
+                        Text("Read Full Here")
                     }
                 }
             }
 
-            // Text Size Menu
-            if (showTextSizeMenu) {
+            // Font Customization Bottom Sheet
+            if (showFontCustomizationSheet) {
                 ModalBottomSheet(
-                    onDismissRequest = { showTextSizeMenu = false },
-                    sheetState = textSizeSheetState,
+                    onDismissRequest = { showFontCustomizationSheet = false },
+                    sheetState = fontCustomizationSheetState,
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 24.dp)
+                            .padding(bottom = 24.dp)
                     ) {
                         Text(
-                            text = "Text Size",
+                            text = "Tùy chỉnh",
                             style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(bottom = 16.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            textAlign = TextAlign.Center
                         )
 
+                        // Font Type selection
                         Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
                         ) {
-                            TextSizePreset.entries.forEach { preset ->
+                            Text(
+                                text = "Kiểu chữ",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .horizontalScroll(rememberScrollState()),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
                                 Button(
-                                    onClick = {
-                                        selectedTextSize = preset
-                                        showTextSizeMenu = false
-                                    },
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text(
-                                        text = when (preset) {
-                                            TextSizePreset.SMALL -> "Small"
-                                            TextSizePreset.MEDIUM -> "Medium"
-                                            TextSizePreset.LARGE -> "Large"
-                                        }
+                                    onClick = { selectedFontFamily = FontPreset.DEFAULT },
+                                    shape = RoundedCornerShape(8.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (selectedFontFamily == FontPreset.DEFAULT)
+                                            MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                        contentColor = if (selectedFontFamily == FontPreset.DEFAULT)
+                                            MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                                     )
+                                ) {
+                                    Text("SF San-serif")
+                                }
+
+                                Button(
+                                    onClick = { selectedFontFamily = FontPreset.GEORGIA },
+                                    shape = RoundedCornerShape(8.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (selectedFontFamily == FontPreset.GEORGIA)
+                                            MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                        contentColor = if (selectedFontFamily == FontPreset.GEORGIA)
+                                            MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                ) {
+                                    Text("Bookerly")
+                                }
+
+                                Button(
+                                    onClick = { selectedFontFamily = FontPreset.ROBOTO },
+                                    shape = RoundedCornerShape(8.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (selectedFontFamily == FontPreset.ROBOTO)
+                                            MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                        contentColor = if (selectedFontFamily == FontPreset.ROBOTO)
+                                            MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                ) {
+                                    Text("Roboto")
+                                }
+
+                                Button(
+                                    onClick = { selectedFontFamily = FontPreset.COURIER },
+                                    shape = RoundedCornerShape(8.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (selectedFontFamily == FontPreset.COURIER)
+                                            MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                        contentColor = if (selectedFontFamily == FontPreset.COURIER)
+                                            MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                ) {
+                                    Text("Courier")
                                 }
                             }
                         }
-                    }
-                }
-            }
 
-            // Font Family Menu
-            if (showFontMenu) {
-                ModalBottomSheet(
-                    onDismissRequest = { showFontMenu = false },
-                    sheetState = fontSheetState,
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 24.dp)
-                    ) {
-                        Text(
-                            text = "Font Family",
-                            style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-
+                        // Font Size slider
                         Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 16.dp)
                         ) {
-                            FontPreset.entries.forEach { preset ->
-                                Button(
-                                    onClick = {
-                                        selectedFontFamily = preset
-                                        showFontMenu = false
+                            Text(
+                                text = "Cỡ chữ",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "A",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    modifier = Modifier.padding(end = 8.dp)
+                                )
+
+                                Slider(
+                                    value = TextSizePreset.entries.indexOf(selectedTextSize)
+                                        .toFloat(),
+                                    onValueChange = { value ->
+                                        val index = value.toInt()
+                                            .coerceIn(0, TextSizePreset.entries.size - 1)
+                                        selectedTextSize = TextSizePreset.entries[index]
                                     },
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text(
-                                        text = when (preset) {
-                                            FontPreset.DEFAULT -> "Default"
-                                            FontPreset.ROBOTO -> "Roboto"
-                                            FontPreset.GEORGIA -> "Georgia"
-                                            FontPreset.COURIER -> "Courier"
-                                        }
-                                    )
-                                }
+                                    valueRange = 0f..5f,
+                                    steps = 4,
+                                    modifier = Modifier.weight(1f)
+                                )
+
+                                Text(
+                                    text = "A",
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    modifier = Modifier.padding(start = 8.dp)
+                                )
                             }
                         }
                     }

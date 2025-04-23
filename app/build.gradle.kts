@@ -45,29 +45,32 @@ android {
 }
 
 dependencies {
+    implementation("com.github.bumptech.glide:glide:5.0.0-rc01")
 
-    implementation ("androidx.media3:media3-exoplayer:1.6.0")
-    implementation ("androidx.media3:media3-ui:1.6.0")
-    implementation ("androidx.media3:media3-common:1.6.0")
-    implementation ("androidx.media3:media3-session:1.6.0")
+    implementation("androidx.media3:media3-exoplayer:1.6.1")
+    implementation("androidx.media3:media3-ui:1.6.1")
+    implementation("androidx.media3:media3-common:1.6.1")
+    implementation("androidx.media3:media3-session:1.6.1")
 
     implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
 
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
-    implementation(platform("com.google.firebase:firebase-bom:33.11.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
     implementation("com.google.firebase:firebase-analytics")
 
     implementation("com.prof18.rssparser:rssparser-android:6.0.10")
 
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
-    implementation("androidx.browser:browser:1.9.0-alpha01")
+    implementation("androidx.browser:browser:1.9.0-alpha02")
     implementation("androidx.recyclerview:recyclerview:1.4.0")
 
 
     implementation("com.squareup.retrofit2:converter-kotlinx-serialization:2.11.0")
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.11.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
 
     implementation("org.jsoup:jsoup:1.19.1")
     implementation("io.coil-kt:coil-compose:2.7.0")
@@ -83,7 +86,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.9.0-alpha08")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
-    implementation("androidx.datastore:datastore-preferences:1.1.3")
+    implementation("androidx.datastore:datastore-preferences:1.1.4")
 
 
     implementation(libs.androidx.core.ktx)
