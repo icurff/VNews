@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material3.Icon
@@ -36,11 +35,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.composables.icons.lucide.Lucide
+import com.composables.icons.lucide.SendHorizontal
 import com.example.vnews.utils.PermissionManager
 import com.example.vnews.utils.SpeechRecognitionUtil
 import com.google.firebase.auth.FirebaseAuth
@@ -52,12 +54,12 @@ import kotlinx.coroutines.launch
 fun BottomCommentBar(encodedArticlePath: String) {
     var commentText by remember { mutableStateOf("") }
     val context = LocalContext.current
-    
+
     // Create SpeechRecognitionUtil instance
     val speechRecognitionUtil = remember { SpeechRecognitionUtil(context) }
     val isListening by speechRecognitionUtil.isListening.collectAsState()
     val speechText by speechRecognitionUtil.speechText.collectAsState()
-    
+
     // Permission state
     var showPermissionRequest by remember { mutableStateOf(false) }
 
@@ -66,7 +68,7 @@ fun BottomCommentBar(encodedArticlePath: String) {
             commentText = speechText
         }
     }
-    
+
     // Clean up resources
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
@@ -138,7 +140,7 @@ fun BottomCommentBar(encodedArticlePath: String) {
                 ) {
                     Text(
                         text = "Listening...",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = TextStyle(fontSize = 14.sp),
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.weight(1f)
                     )
@@ -165,7 +167,7 @@ fun BottomCommentBar(encodedArticlePath: String) {
                         focusedContainerColor = Color.Transparent
                     )
                 )
-                
+
                 // Speech recognition toggle button
                 IconButton(
                     onClick = {
@@ -205,7 +207,7 @@ fun BottomCommentBar(encodedArticlePath: String) {
                     }
                 }) {
                     Icon(
-                        Icons.AutoMirrored.Outlined.Send,
+                        Lucide.SendHorizontal,
                         contentDescription = "Send",
                         tint = Gray
                     )

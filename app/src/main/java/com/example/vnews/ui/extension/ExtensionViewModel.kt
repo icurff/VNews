@@ -53,6 +53,12 @@ class ExtensionViewModel @Inject constructor(
     private val _extensionArticles = MutableStateFlow<List<RssItem>>(emptyList())
     val extensionArticles = _extensionArticles.asStateFlow()
 
+    private val _error = MutableStateFlow<String?>(null)
+    val error = _error.asStateFlow()
+
+    private val _successMessage = MutableStateFlow<String?>(null)
+    val successMessage = _successMessage.asStateFlow()
+
     private val rssParser = RssParser()
 
     init {
@@ -97,8 +103,16 @@ class ExtensionViewModel @Inject constructor(
 
     fun addExtension(rss: RssSource) {
         viewModelScope.launch {
-            extRepo.installExtension(rss.toExtensionEntity())
-            observeInstalled()
+            val currentInstalled = _installed.value
+            val duplicateSource = currentInstalled.any { it.source.equals(rss.source, ignoreCase = true) }
+            
+            if (duplicateSource) {
+                _error.value = "An RSS source with this URL already exists"
+            } else {
+                extRepo.installExtension(rss.toExtensionEntity())
+                _successMessage.value = "Extension added successfully"
+                observeInstalled()
+            }
         }
     }
 
@@ -153,6 +167,14 @@ class ExtensionViewModel @Inject constructor(
                 _isLoading.value = false
             }
         }
+    }
+
+    fun clearError() {
+        _error.value = null
+    }
+    
+    fun clearSuccessMessage() {
+        _successMessage.value = null
     }
 }
 

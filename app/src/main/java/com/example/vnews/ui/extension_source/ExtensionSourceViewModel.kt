@@ -23,7 +23,7 @@ class ExtensionSourceViewModel @Inject constructor(
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
-    
+
     private val _successMessage = MutableStateFlow<String?>(null)
     val successMessage: StateFlow<String?> = _successMessage.asStateFlow()
 
@@ -43,9 +43,28 @@ class ExtensionSourceViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                repoRepository.addRepo(repoName,sourceUrl)
-                _error.value = null
-                _successMessage.value = "Repository added successfully"
+                // Check for duplicate URL
+                val existingRepos = _repositories.value
+                val duplicateUrl =
+                    existingRepos.any { it.source.equals(sourceUrl, ignoreCase = true) }
+                val duplicateName =
+                    existingRepos.any { it.sourceName.equals(repoName, ignoreCase = true) }
+
+                when {
+                    duplicateUrl -> {
+                        _error.value = "A repository with this URL already exists"
+                    }
+
+                    duplicateName -> {
+                        _error.value = "A repository with this name already exists"
+                    }
+
+                    else -> {
+                        repoRepository.addRepo(repoName, sourceUrl)
+                        _error.value = null
+                        _successMessage.value = "Repository added successfully"
+                    }
+                }
             } catch (e: Exception) {
                 _error.value = "Failed to add repository: ${e.message}"
             } finally {
@@ -70,10 +89,31 @@ class ExtensionSourceViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val updatedRepo = repository.copy(sourceName = newName, source = newUrl)
-                repoRepository.updateRepo(updatedRepo)
-                _error.value = null
-                _successMessage.value = "Repository updated successfully"
+                // Check for duplicate URL and name when updating
+                val existingRepos = _repositories.value
+                val duplicateUrl = existingRepos.any {
+                    it.id != repository.id && it.source.equals(newUrl, ignoreCase = true)
+                }
+                val duplicateName = existingRepos.any {
+                    it.id != repository.id && it.sourceName.equals(newName, ignoreCase = true)
+                }
+
+                when {
+                    duplicateUrl -> {
+                        _error.value = "A repository with this URL already exists"
+                    }
+
+                    duplicateName -> {
+                        _error.value = "A repository with this name already exists"
+                    }
+
+                    else -> {
+                        val updatedRepo = repository.copy(sourceName = newName, source = newUrl)
+                        repoRepository.updateRepo(updatedRepo)
+                        _error.value = null
+                        _successMessage.value = "Repository updated successfully"
+                    }
+                }
             } catch (e: Exception) {
                 _error.value = "Failed to update repository: ${e.message}"
             } finally {
@@ -84,5 +124,9 @@ class ExtensionSourceViewModel @Inject constructor(
 
     fun clearSuccessMessage() {
         _successMessage.value = null
+    }
+
+    fun clearError() {
+        _error.value = null
     }
 } 

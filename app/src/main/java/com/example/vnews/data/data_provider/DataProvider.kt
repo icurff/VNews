@@ -1,8 +1,10 @@
 package com.example.vnews.data.data_provider
 
+import com.example.vnews.R
+
 data class CategoryEntity(
     val id: Int,
-    val name: String
+    val nameResId: Int
 )
 
 data class DefaultExtension(
@@ -15,15 +17,15 @@ data class DefaultExtension(
 
 object Categories {
     val all = listOf(
-        CategoryEntity(1, "Tin mới"),
-        CategoryEntity(2, "Thế giới"),
-        CategoryEntity(3, "Kinh tế"),
-        CategoryEntity(4, "Đời sống"),
-        CategoryEntity(5, "Sức khỏe"),
-        CategoryEntity(6, "Văn hóa"),
-        CategoryEntity(7, "Giải trí"),
-        CategoryEntity(8, "Thể thao"),
-        CategoryEntity(9, "Công nghệ")
+        CategoryEntity(1, R.string.category_latest),
+        CategoryEntity(2, R.string.category_world),
+        CategoryEntity(3, R.string.category_economy),
+        CategoryEntity(4, R.string.category_life),
+        CategoryEntity(5, R.string.category_health),
+        CategoryEntity(6, R.string.category_culture),
+        CategoryEntity(7, R.string.category_entertainment),
+        CategoryEntity(8, R.string.category_sports),
+        CategoryEntity(9, R.string.category_technology)
     )
 }
 

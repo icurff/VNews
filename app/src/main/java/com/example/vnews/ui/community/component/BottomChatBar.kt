@@ -21,9 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material3.CircularProgressIndicator
@@ -54,6 +52,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
+import com.composables.icons.lucide.ImagePlus
+import com.composables.icons.lucide.Lucide
+import com.composables.icons.lucide.SendHorizontal
 import com.example.vnews.utils.ImageUtils
 import com.example.vnews.utils.PermissionManager
 import com.example.vnews.utils.SpeechRecognitionUtil
@@ -246,7 +247,7 @@ fun BottomChatBar() {
                 enabled = !isUploading
             ) {
                 Icon(
-                    imageVector = Icons.Default.Image,
+                    Lucide.ImagePlus,
                     contentDescription = "Attach image",
                     tint = if (selectedImageUri != null) MaterialTheme.colorScheme.primary else Gray,
                     modifier = Modifier.size(24.dp)
@@ -303,7 +304,7 @@ fun BottomChatBar() {
                     enabled = (messageText.isNotBlank() || selectedImageUri != null) && !isUploading
                 ) {
                     Icon(
-                        Icons.AutoMirrored.Outlined.Send,
+                        Lucide.SendHorizontal,
                         contentDescription = "Send",
                         tint = if (messageText.isNotBlank() || selectedImageUri != null)
                             MaterialTheme.colorScheme.primary else Gray

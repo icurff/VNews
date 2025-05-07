@@ -4,11 +4,6 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -17,10 +12,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.composables.icons.lucide.House
+import com.composables.icons.lucide.Layers
+import com.composables.icons.lucide.Lucide
+import com.composables.icons.lucide.MessageCircleMore
+import com.composables.icons.lucide.User
+import com.example.vnews.data.datastore.AppSettingsManager
 import com.example.vnews.ui.article.ArticleDetailScreen
 import com.example.vnews.ui.article.ArticleViewModel
 import com.example.vnews.ui.article.SavedArticlesScreen
 import com.example.vnews.ui.article.ViewedArticlesScreen
+import com.example.vnews.ui.community.CommunityScreen
 import com.example.vnews.ui.extension.ExtensionDetailScreen
 import com.example.vnews.ui.extension.ExtensionScreen
 import com.example.vnews.ui.extension.ExtensionViewModel
@@ -28,7 +30,6 @@ import com.example.vnews.ui.extension_source.ExtensionSourceScreen
 import com.example.vnews.ui.extension_source.ExtensionSourceViewModel
 import com.example.vnews.ui.home.HomeScreen
 import com.example.vnews.ui.home.RssViewModel
-import com.example.vnews.ui.community.CommunityScreen
 import com.example.vnews.ui.search.SearchScreen
 import com.example.vnews.ui.user_setting.UserScreen
 
@@ -40,24 +41,24 @@ sealed class Screen(
     object Home : Screen(
         route = "home_graph",
         title = "Home",
-        icon = { Icon(Icons.Default.Home, contentDescription = "Home") })
+        icon = { Icon(Lucide.House, contentDescription = "Home") })
 
     object Extension : Screen(
         route = "extension",
         title = "Extensions",
-        icon = { Icon(Icons.Default.Build, contentDescription = "extensions") }
+        icon = { Icon(Lucide.Layers, contentDescription = "extensions") }
     )
 
     object Community : Screen(
         route = "community",
         title = "Community",
-        icon = { Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Settings") }
+        icon = { Icon(Lucide.MessageCircleMore, contentDescription = "Settings") }
     )
 
     object Settings : Screen(
         route = "settings",
         title = "User",
-        icon = { Icon(Icons.Default.Settings, contentDescription = "User") }
+        icon = { Icon(Lucide.User, contentDescription = "User") }
     )
 
     object ArticleDetail : Screen("article/{articleSource}") {
@@ -80,34 +81,11 @@ sealed class Screen(
 @Composable
 fun NavGraph(
     navController: NavHostController,
+    appSettingsManager: AppSettingsManager
 ) {
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route,
-        enterTransition = {
-            slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec = tween(700)
-            ) + fadeIn(animationSpec = tween(700))
-        },
-        exitTransition = {
-            slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec = tween(700)
-            ) + fadeOut(animationSpec = tween(700))
-        },
-        popEnterTransition = {
-            slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                animationSpec = tween(700)
-            ) + fadeIn(animationSpec = tween(700))
-        },
-        popExitTransition = {
-            slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                animationSpec = tween(700)
-            ) + fadeOut(animationSpec = tween(700))
-        }
     ) {
         composable(route = Screen.Community.route,
             enterTransition = {
@@ -140,8 +118,7 @@ fun NavGraph(
         navigation(
             route = "home_graph",
             startDestination = "home",
-
-            ) {
+        ) {
             composable("home") { backStackEntry ->
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry("home_graph")
@@ -152,7 +129,8 @@ fun NavGraph(
                 HomeScreen(
                     rssViewModel = rssViewModel,
                     articleViewModel = articleViewModel,
-                    navController = navController
+                    navController = navController,
+                    appSettingsManager = appSettingsManager
                 )
             }
 
@@ -387,30 +365,6 @@ fun NavGraph(
         navigation(route = "settings_graph", startDestination = "settings") {
             composable(
                 route = Screen.Settings.route,
-                enterTransition = {
-                    slideIntoContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                        animationSpec = tween(700)
-                    ) + fadeIn(animationSpec = tween(700))
-                },
-                exitTransition = {
-                    slideOutOfContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                        animationSpec = tween(700)
-                    ) + fadeOut(animationSpec = tween(700))
-                },
-                popEnterTransition = {
-                    slideIntoContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                        animationSpec = tween(700)
-                    ) + fadeIn(animationSpec = tween(700))
-                },
-                popExitTransition = {
-                    slideOutOfContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                        animationSpec = tween(700)
-                    ) + fadeOut(animationSpec = tween(700))
-                }
             ) { UserScreen(navController) }
 
             composable(

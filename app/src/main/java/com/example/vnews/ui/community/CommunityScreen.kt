@@ -28,12 +28,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.vnews.ui.community.component.BottomChatBar
-import com.example.vnews.ui.components.MessageItem
+import com.example.vnews.ui.community.component.MessageItem
 import com.example.vnews.ui.user_setting.UserViewModel
 import kotlinx.coroutines.launch
 
@@ -82,7 +85,14 @@ fun CommunityScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Community") },
+                title = {
+                    Text(
+                        text = "Community", style = TextStyle(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(

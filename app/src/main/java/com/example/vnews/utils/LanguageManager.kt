@@ -1,7 +1,9 @@
 package com.example.vnews.utils
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
+import android.os.LocaleList
 import java.util.Locale
 
 object LanguageManager {
@@ -12,8 +14,20 @@ object LanguageManager {
         val resources = context.resources
         val config = Configuration(resources.configuration)
 
-        config.setLocale(locale)
+        val localeList = LocaleList(locale)
+        LocaleList.setDefault(localeList)
+        config.setLocales(localeList)
+
+        // Update the configuration for the resources
+        resources.updateConfiguration(config, resources.displayMetrics)
+
+        // Apply to context
         context.createConfigurationContext(config)
+
+        // Apply changes to the activity if available
+        if (context is Activity) {
+            context.recreate()
+        }
     }
 
     fun getCurrentLanguage(context: Context): String {

@@ -62,7 +62,7 @@ private fun PulsatingDot(phase: Float) {
 
     Box(
         modifier = Modifier
-            .size(8.dp)
+            .size(10.dp)
             .scale(scale)
             .background(
                 color = MaterialTheme.colorScheme.primary,

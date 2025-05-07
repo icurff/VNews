@@ -14,45 +14,40 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.vnews.ui.article.ArticleViewModel
+import com.example.vnews.ui.home.LayoutType
 import com.example.vnews.ui.home.RssItem
 import com.example.vnews.ui.home.RssViewModel
 import com.example.vnews.ui.navigation.Screen
 import com.example.vnews.utils.DateTimeUtil
 import com.example.vnews.utils.StringUtils
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +57,8 @@ fun RssFeedList(
     categoryId: Int?,
     modifier: Modifier = Modifier,
     navController: NavController,
-    searchQuery: String? = null
+    searchQuery: String? = null,
+    layoutType: LayoutType = LayoutType.LIST
 ) {
     val rssItems by rssViewModel.rssItems.collectAsState()
     val isLoading by rssViewModel.isLoading.collectAsState()
@@ -100,16 +96,76 @@ fun RssFeedList(
             },
             modifier = modifier
         ) {
-            LazyColumn(
-                modifier = modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
-            ) {
-                items(filteredItems) { item ->
-                    RssItemCard(
-                        item = item,
-                        onClick = { handleRssItemCardClick(item, articleViewModel, navController) }
-                    )
+            when (layoutType) {
+                LayoutType.LIST -> {
+                    LazyColumn(
+                        modifier = modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(filteredItems) { item ->
+                            RssItemCard(
+                                item = item,
+                                onClick = {
+                                    handleRssItemCardClick(
+                                        item,
+                                        articleViewModel,
+                                        navController
+                                    )
+                                },
+                                isGridLayout = false,
+                                isExpandedLayout = false
+                            )
+                        }
+                    }
+                }
+
+                LayoutType.GRID -> {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(filteredItems) { item ->
+                            RssItemCard(
+                                item = item,
+                                onClick = {
+                                    handleRssItemCardClick(
+                                        item,
+                                        articleViewModel,
+                                        navController
+                                    )
+                                },
+                                isGridLayout = true,
+                                isExpandedLayout = false
+                            )
+                        }
+                    }
+                }
+
+                LayoutType.EXPANDED -> {
+                    LazyColumn(
+                        modifier = modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(filteredItems) { item ->
+                            RssItemCard(
+                                item = item,
+                                onClick = {
+                                    handleRssItemCardClick(
+                                        item,
+                                        articleViewModel,
+                                        navController
+                                    )
+                                },
+                                isGridLayout = false,
+                                isExpandedLayout = true
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -126,105 +182,64 @@ fun handleRssItemCardClick(
     navController.navigate(Screen.ArticleDetail.createRoute(encodedUrl))
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RssItemCard(
     item: RssItem,
     onClick: () -> Unit,
+    isGridLayout: Boolean,
+    isExpandedLayout: Boolean = false
 ) {
-    var showEditSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val scope = rememberCoroutineScope()
-
-    if (showEditSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showEditSheet = false },
-            sheetState = sheetState,
-            dragHandle = null,
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.padding(bottom = 50.dp, start = 24.dp, end = 24.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(LocalConfiguration.current.screenHeightDp.dp * 0.3f)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Button(
-                        onClick = {
-                            showEditSheet = false
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.PlaylistAdd,
-                            contentDescription = "Add to Playlist",
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                        Text("Add to Playlist")
-                    }
-
-
-                }
-
-            }
-        }
-    }
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = { onClick() },
-                    onLongPress = {
-                        scope.launch {
-                            showEditSheet = true
-                            sheetState.show()
-                        }
-                    }
                 )
-            }
+            },
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 3.dp
+        ),
+        shape = RoundedCornerShape(12.dp),
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
-            AsyncImage(
-                model = item.thumbnail,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
-            )
-
-            Spacer(modifier = Modifier.width(12.dp))
-
+        if (isExpandedLayout) {
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .height(100.dp)
+                    .fillMaxWidth()
+                    .padding(12.dp)
             ) {
-                // Title
+                AsyncImage(
+                    model = item.thumbnail,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Text(
                     text = item.title,
-                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp),
+                    style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                // Info row
+                Text(
+                    text = item.summary,
+                    style = TextStyle(fontSize = 14.sp),
+                    maxLines = 4,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -237,24 +252,142 @@ private fun RssItemCard(
                             model = item.extensionIcon,
                             contentDescription = null,
                             modifier = Modifier
-                                .size(18.dp)
+                                .size(20.dp)
                                 .padding(end = 4.dp)
                         )
                         Text(
                             text = item.extensionName,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
+                            style = TextStyle(fontSize = 12.sp),
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
 
                     Text(
-                        text = DateTimeUtil.getRelativeTime(item.pubTime),
-                        style = MaterialTheme.typography.labelSmall,
+                        text = DateTimeUtil.getRelativeTimeString(item.pubTime),
+                        style = TextStyle(fontSize = 12.sp),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
+        } else if (isGridLayout) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                AsyncImage(
+                    model = item.thumbnail,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
+                )
 
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = item.title,
+                    style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AsyncImage(
+                            model = item.extensionIcon,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(16.dp)
+                                .padding(end = 4.dp)
+                        )
+                        Text(
+                            text = item.extensionName,
+                            style = TextStyle(fontSize = 10.sp),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    Text(
+                        text = DateTimeUtil.getRelativeTimeString(item.pubTime),
+                        style = TextStyle(fontSize = 10.sp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                AsyncImage(
+                    model = item.thumbnail,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
+                )
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(100.dp)
+                ) {
+                    Text(
+                        text = item.title,
+                        style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold),
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            AsyncImage(
+                                model = item.extensionIcon,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .padding(end = 4.dp)
+                            )
+                            Text(
+                                text = item.extensionName,
+                                style = TextStyle(fontSize = 12.sp),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
+                        Text(
+                            text = DateTimeUtil.getRelativeTimeString(item.pubTime),
+                            style = TextStyle(fontSize = 12.sp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
         }
     }
 } 

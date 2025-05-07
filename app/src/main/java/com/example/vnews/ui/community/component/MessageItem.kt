@@ -1,4 +1,4 @@
-package com.example.vnews.ui.components
+package com.example.vnews.ui.community.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,8 +23,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
@@ -147,7 +150,7 @@ fun MessageItem(
                 // Sender name
                 Text(
                     text = senderName,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(2.dp))
@@ -161,7 +164,7 @@ fun MessageItem(
                             MaterialTheme.colorScheme.primary
                         else
                             MaterialTheme.colorScheme.surfaceVariant,
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(18.dp)
                     )
                     .padding(
                         horizontal = if (imageUrl.isNullOrBlank()) 12.dp else 4.dp,

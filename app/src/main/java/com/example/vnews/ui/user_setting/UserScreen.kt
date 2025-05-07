@@ -1,6 +1,15 @@
 package com.example.vnews.ui.user_setting
 
 import android.app.Activity
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,6 +21,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,7 +33,6 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Language
-import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -42,23 +51,31 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.vnews.R
-import com.example.vnews.ui.shared_component.BottomNavBar
 import com.example.vnews.ui.navigation.Screen
+import com.example.vnews.ui.shared_component.BottomNavBar
+import com.example.vnews.utils.LanguageManager
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,255 +89,294 @@ fun UserScreen(
     val userPhotoUrl by viewModel.userPhotoUrl.collectAsState()
     val appSettings by appSettingsViewModel.appSettings.collectAsState()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     var showLanguageDropdown by remember { mutableStateOf(false) }
+    var isChangingLanguage by remember { mutableStateOf(false) }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.user_title)) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
+    // Animation for rotation when changing language
+    val infiniteTransition = rememberInfiniteTransition(label = "restartAnimation")
+    val rotation = infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "rotationAnimation"
+    )
+
+    // Language change handler
+    fun changeLanguage(languageCode: String) {
+        if (appSettings.language != languageCode) {
+            isChangingLanguage = true
+            scope.launch {
+                // First update the preferences
+                appSettingsViewModel.setLanguage(languageCode)
+
+                // Show animation for 1.5 seconds
+                delay(1500)
+
+                // Then force recreate using the current activity context
+                val activity = context as? Activity
+                if (activity != null) {
+                    // Re-apply locale settings directly to activity context
+                    LanguageManager.setLocale(activity, languageCode)
+                }
+            }
+        }
+        showLanguageDropdown = false
+    }
+
+    AnimatedVisibility(
+        visible = !isChangingLanguage,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(R.string.user_title),
+                            style = TextStyle(
+                                fontSize = 24.sp, fontWeight = FontWeight.Bold,
+                            )
                         )
-                    }
-                },
-                actions = {
-                    if (isLoggedIn) {
-                        IconButton(onClick = { viewModel.signOut(context as Activity) }) {
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                                contentDescription = stringResource(R.string.logout)
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.back)
                             )
                         }
-                    }
-                }
-            )
-        },
-        bottomBar = { BottomNavBar(navController) }
-    ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
-                UserProfile(
-                    isLoggedIn = isLoggedIn,
-                    userName = userName,
-                    userPhotoUrl = userPhotoUrl,
-                    onGoogleSignInClick = { viewModel.signInWithGoogle(context as Activity) }
-                )
-            }
-
-            // App Section
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Gray)
-                        .padding(16.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.app_section),
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-
-            // Theme Setting
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.DarkMode,
-                                contentDescription = stringResource(R.string.dark_mode),
-                                tint = Color.Gray,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text(
-                                text = stringResource(R.string.dark_mode),
-                                style = MaterialTheme.typography.titleLarge
-                            )
-                        }
-                        Switch(
-                            checked = appSettings.isDarkTheme,
-                            onCheckedChange = { appSettingsViewModel.setDarkTheme(it) }
-                        )
-                    }
-                }
-            }
-
-            // Language Setting
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Language,
-                                contentDescription = stringResource(R.string.language),
-                                tint = Color.Gray,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text(
-                                text = stringResource(R.string.language),
-                                style = MaterialTheme.typography.titleLarge
-                            )
-                        }
-                        
-                        Box {
-                            Text(
-                                text = when (appSettings.language) {
-                                    "en" -> stringResource(R.string.english)
-                                    "vi" -> stringResource(R.string.vietnamese)
-                                    else -> stringResource(R.string.english)
-                                },
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.clickable { showLanguageDropdown = true }
-                            )
-                            
-                            DropdownMenu(
-                                expanded = showLanguageDropdown,
-                                onDismissRequest = { showLanguageDropdown = false }
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.english)) },
-                                    onClick = {
-                                        appSettingsViewModel.setLanguage("en")
-                                        showLanguageDropdown = false
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.vietnamese)) },
-                                    onClick = {
-                                        appSettingsViewModel.setLanguage("vi")
-                                        showLanguageDropdown = false
-                                    }
+                    },
+                    actions = {
+                        if (isLoggedIn) {
+                            IconButton(onClick = { viewModel.signOut(context as Activity) }) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                    contentDescription = stringResource(R.string.logout)
                                 )
                             }
                         }
                     }
-                }
-            }
-
-            // App - Saved Articles
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { navController.navigate(Screen.SavedArticles.route) }
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.BookmarkBorder,
-                            contentDescription = stringResource(R.string.saved_articles),
-                            tint = Color.Gray,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            text = stringResource(R.string.saved_articles),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                    }
-                }
-            }
-
-            // App - Viewed Articles
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { navController.navigate(Screen.ViewedArticles.route) }
-                        .padding(16.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Visibility,
-                            contentDescription = stringResource(R.string.viewed_articles),
-                            tint = Color.Gray,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            text = stringResource(R.string.viewed_articles),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                    }
-                }
-            }
-
-            // Connection Section
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Gray)
-                        .padding(16.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.connection_section),
-                        fontWeight = FontWeight.Bold
+                )
+            },
+            bottomBar = { BottomNavBar(navController) }
+        ) { innerPadding ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                item {
+                    UserProfile(
+                        isLoggedIn = isLoggedIn,
+                        userName = userName,
+                        userPhotoUrl = userPhotoUrl,
+                        onGoogleSignInClick = { viewModel.signInWithGoogle(context as Activity) }
                     )
                 }
-            }
 
-            // Connection - Fb
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { }
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                // App Section
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .padding(16.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Public,
-                            contentDescription = stringResource(R.string.follow_facebook),
-                            tint = Color.Gray,
-                            modifier = Modifier.size(24.dp)
-                        )
                         Text(
-                            text = stringResource(R.string.follow_facebook),
-                            style = MaterialTheme.typography.titleLarge
+                            text = stringResource(R.string.app_section),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
+
+                // Theme Setting
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.DarkMode,
+                                    contentDescription = stringResource(R.string.dark_mode),
+                                    tint = Color.Gray,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = stringResource(R.string.dark_mode),
+                                    style = MaterialTheme.typography.titleLarge
+                                )
+                            }
+                            Switch(
+                                checked = appSettings.isDarkTheme,
+                                onCheckedChange = { appSettingsViewModel.setDarkTheme(it) }
+                            )
+                        }
+                    }
+                }
+
+                // Language Setting
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Language,
+                                    contentDescription = stringResource(R.string.language),
+                                    tint = Color.Gray,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = stringResource(R.string.language),
+                                    style = MaterialTheme.typography.titleLarge
+                                )
+                            }
+
+                            Box {
+                                Text(
+                                    text = when (appSettings.language) {
+                                        "en" -> stringResource(R.string.english)
+                                        "vi" -> stringResource(R.string.vietnamese)
+                                        else -> stringResource(R.string.english)
+                                    },
+                                    style = TextStyle(fontSize = 16.sp),
+                                    modifier = Modifier.clickable { showLanguageDropdown = true }
+                                )
+
+                                DropdownMenu(
+                                    expanded = showLanguageDropdown,
+                                    onDismissRequest = { showLanguageDropdown = false }
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.english)) },
+                                        onClick = { changeLanguage("en") }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.vietnamese)) },
+                                        onClick = { changeLanguage("vi") }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // App - Saved Articles
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { navController.navigate(Screen.SavedArticles.route) }
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.BookmarkBorder,
+                                contentDescription = stringResource(R.string.saved_articles),
+                                tint = Color.Gray,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.saved_articles),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        }
+                    }
+                }
+
+                // App - Viewed Articles
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { navController.navigate(Screen.ViewedArticles.route) }
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Visibility,
+                                contentDescription = stringResource(R.string.viewed_articles),
+                                tint = Color.Gray,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.viewed_articles),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Show loading animation when changing language
+    AnimatedVisibility(
+        visible = isChangingLanguage,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Language,
+                    contentDescription = "Changing Language",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .size(72.dp)
+                        .padding(8.dp)
+                        .clickable { }
+                        .padding(8.dp)
+                        .rotate(rotation.value)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(R.string.changing_language),
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
@@ -339,6 +395,7 @@ fun UserProfile(
                 modifier = Modifier
                     .size(100.dp)
                     .clip(CircleShape)
+                    .background(Color(0xFF8080FF))
                     .border(0.5.dp, MaterialTheme.colorScheme.onSurface, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
@@ -352,24 +409,30 @@ fun UserProfile(
                         contentScale = ContentScale.Crop
                     )
                 } else {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_user),
-                        contentDescription = "User Icon",
-                        modifier = Modifier.size(70.dp),
-                        tint = MaterialTheme.colorScheme.onSurface
+                    Text(
+                        text = "G",
+                        color = Color.White,
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = userName, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = if (isLoggedIn) userName else "Guest",
+                fontSize = 18.sp
+            )
         }
         if (!isLoggedIn) {
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             Button(
                 onClick = onGoogleSignInClick,
-                modifier = Modifier.fillMaxWidth(0.8f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                border = BorderStroke(1.dp, Color.LightGray)
+                border = BorderStroke(1.dp, Color.LightGray),
+                shape = MaterialTheme.shapes.medium
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_google),
@@ -381,7 +444,8 @@ fun UserProfile(
                 Text(
                     text = stringResource(R.string.login_with_google),
                     color = Color.Black,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal
                 )
             }
         }

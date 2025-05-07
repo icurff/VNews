@@ -1,21 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">VNews</string>
-    
+
+    <!-- Add other categories -->
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_extensions">Extensions</string>
+    <string name="nav_community">Community</string>
+    <string name="nav_user">User</string>
+    <!-- Screen Titles -->
+    <string name="article_detail_title">Article Detail</string>
+    <string name="extension_detail_title">Extension Detail</string>
+    <string name="saved_articles_title">Saved Articles</string>
+    <string name="viewed_articles_title">Viewed Articles</string>
+    <string name="search_title">Search</string>
+    <string name="repository_title">Repository</string>
     <!-- User Screen -->
-    <string name="user_title">Người dùng</string>
-    <string name="back">Quay lại</string>
-    <string name="logout">Đăng xuất</string>
-    <string name="dark_mode">Chế độ tối</string>
-    <string name="language">Ngôn ngữ</string>
-    <string name="english">Tiếng Anh</string>
+    <string name="user_title">User</string>
+    <string name="back">Back</string>
+    <string name="logout">Log out</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="language">Language</string>
+    <string name="english">English</string>
     <string name="vietnamese">Tiếng Việt</string>
-    <string name="saved_articles">Bài viết đã lưu</string>
-    <string name="viewed_articles">Bài viết đã xem</string>
-    <string name="follow_facebook">Theo dõi Facebook</string>
-    <string name="login_with_google">Đăng nhập bằng Google</string>
-    
+    <string name="saved_articles">Saved Articles</string>
+    <string name="viewed_articles">Viewed Articles</string>
+    <string name="follow_facebook">Follow Facebook page</string>
+    <string name="login_with_google">Login with Google</string>
+    <!-- values-en/strings.xml (English) -->
+    <string name="category_latest">Latest</string>
+    <string name="category_world">World</string>
+    <string name="category_economy">Economy</string>
+    <string name="category_life">Life</string>
+    <string name="category_health">Health</string>
+    <string name="category_culture">Culture</string>
+    <string name="category_entertainment">Entertainment</string>
+    <string name="category_sports">Sports</string>
+    <string name="category_technology">Technology</string>
     <!-- App Sections -->
-    <string name="app_section">Ứng dụng</string>
-    <string name="connection_section">Kết nối</string>
+    <string name="app_section">App</string>
+    <string name="connection_section">Connection</string>
+    
+    <!-- Language Change Dialog -->
+    <string name="language_change_notice">Language will change after restarting the app</string>
+    <string name="restart_now">Restart Now</string>
+    <string name="changing_language">Changing language...</string>
 </resources> 

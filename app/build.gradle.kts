@@ -45,6 +45,8 @@ android {
 }
 
 dependencies {
+    implementation("com.composables:icons-lucide:1.0.0")
+
     implementation("com.github.bumptech.glide:glide:5.0.0-rc01")
 
     implementation("androidx.media3:media3-exoplayer:1.6.1")
@@ -80,6 +82,7 @@ dependencies {
 
     implementation("androidx.room:room-runtime:2.7.0-rc02")
     implementation(libs.googleid)
+    implementation(libs.litert.support.api)
     ksp("androidx.room:room-compiler:2.6.1")
 
     implementation("com.google.dagger:hilt-android:2.56")

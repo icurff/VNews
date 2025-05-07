@@ -33,13 +33,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.TextFormat
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
@@ -69,6 +66,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -78,6 +78,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -85,12 +86,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.composables.icons.lucide.Lucide
+import com.composables.icons.lucide.MessageCircle
+import com.composables.icons.lucide.Settings2
+import com.composables.icons.lucide.Volume2
 import com.example.vnews.R
 import com.example.vnews.data.model.ArticleItem
 import com.example.vnews.ui.article.component.AudioController
 import com.example.vnews.ui.article.component.BottomCommentBar
 import com.example.vnews.ui.article.component.CommentItem
 import com.example.vnews.ui.article.component.SpeedControlSheet
+import com.example.vnews.ui.theme.NewsBlue
+import com.example.vnews.ui.theme.NewsGradient
 import com.example.vnews.utils.DateTimeUtil
 import com.example.vnews.utils.StringUtils
 import com.example.vnews.utils.TextToSpeechUtil
@@ -98,12 +105,12 @@ import kotlinx.coroutines.launch
 
 // Text size presets
 enum class TextSizePreset(val size: Float) {
-    EXTRA_SMALL(10f),
-    SMALL(12f),
-    MEDIUM(14f),
-    LARGE(16f),
-    EXTRA_LARGE(18f),
-    HUGE(20f)
+    EXTRA_SMALL(14f),
+    SMALL(16f),
+    MEDIUM(18f),
+    LARGE(22f),
+    EXTRA_LARGE(24f),
+    HUGE(26f)
 }
 
 // Font family presets
@@ -200,46 +207,56 @@ fun ArticleDetailScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        AsyncImage(
-                            model = selectedArticle?.extensionIcon,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(24.dp)
-                                .padding(end = 8.dp)
-                        )
-                        Text(
-                            text = selectedArticle?.extensionName ?: "Unknown Source",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = handleBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(
+                        elevation = 16.dp,
+                        spotColor = Color.Black.copy(alpha = 0.4f)
+                    )
+                    .drawBehind {
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Black.copy(alpha = 0.5f),
+                                    Color.Transparent
+                                ),
+                                startY = size.height,
+                                endY = size.height + 16.dp.toPx()
+                            )
                         )
                     }
-                },
-                actions = {
-                    IconButton(onClick = { showFontCustomizationSheet = true }) {
-                        Icon(
-                            imageVector = Icons.Filled.TextFormat,
-                            contentDescription = "Text Settings"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
+            ) {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            AsyncImage(
+                                model = selectedArticle?.extensionIcon,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .padding(end = 8.dp)
+                            )
+                            Text(
+                                text = selectedArticle?.extensionName ?: "Unknown Source",
+                                style = TextStyle(
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    brush = Brush.horizontalGradient(
+                                        NewsGradient
+                                    )
+                                ),
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
                 )
-            )
+            }
         },
         bottomBar = {
             if (selectedArticle != null && articleContent != null) {
@@ -257,7 +274,7 @@ fun ArticleDetailScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
                             .padding(
                                 bottom = WindowInsets.navigationBars
                                     .asPaddingValues()
@@ -296,7 +313,7 @@ fun ArticleDetailScreen(
                                 modifier = Modifier.size(36.dp)
                             ) {
                                 Icon(
-                                    imageVector = Icons.Filled.PlayArrow,
+                                    imageVector = Lucide.Volume2,
                                     contentDescription = "Play",
                                     modifier = Modifier.size(28.dp)
                                 )
@@ -306,14 +323,16 @@ fun ArticleDetailScreen(
                                 badge = {
                                     if (comments.isNotEmpty()) {
                                         Badge(
-                                            containerColor = Color.Red,
+                                            containerColor = NewsBlue,
                                             contentColor = Color.White
                                         ) {
                                             Text(
                                                 text = if (comments.size > 99) "99+" else comments.size.toString(),
-                                                fontSize = 10.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                textAlign = TextAlign.Center,
+                                                style = TextStyle(
+                                                    fontSize = 12.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    textAlign = TextAlign.Center,
+                                                ),
                                                 maxLines = 1
                                             )
                                         }
@@ -325,7 +344,7 @@ fun ArticleDetailScreen(
                                     modifier = Modifier.size(36.dp)
                                 ) {
                                     Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.Comment,
+                                        imageVector = Lucide.MessageCircle,
                                         contentDescription = "Comments",
                                         modifier = Modifier.size(28.dp)
                                     )
@@ -372,6 +391,13 @@ fun ArticleDetailScreen(
                                     imageVector = Icons.Filled.Share,
                                     contentDescription = "Share",
                                     modifier = Modifier.size(28.dp)
+                                )
+                            }
+                            // Setting
+                            IconButton(onClick = { showFontCustomizationSheet = true }) {
+                                Icon(
+                                    imageVector = Lucide.Settings2,
+                                    contentDescription = "Text Settings"
                                 )
                             }
                         }
@@ -479,7 +505,7 @@ fun ArticleDetailScreen(
                 item {
                     Text(
                         text = selectedArticle?.title ?: "",
-                        style = MaterialTheme.typography.headlineMedium,
+                        style = TextStyle(fontSize = 34.sp, fontWeight = FontWeight.Bold),
                         textAlign = TextAlign.Start,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -506,7 +532,7 @@ fun ArticleDetailScreen(
                     ) {
                         Text(
                             text = DateTimeUtil.getRelativeTime(selectedArticle?.pubTime ?: 0),
-                            style = MaterialTheme.typography.labelSmall,
+                            style = TextStyle(fontSize = 14.sp),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
@@ -558,12 +584,15 @@ fun ArticleDetailScreen(
                                                     ), 0f
                                                 )
                                             ),
-                                            cornerRadius = androidx.compose.ui.geometry.CornerRadius(
+                                            cornerRadius = CornerRadius(
                                                 12.dp.toPx()
                                             )
                                         )
                                     }
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
                                     .padding(16.dp)
+
                             ) {
                                 Column {
                                     if (isSummarizing) {
@@ -575,7 +604,7 @@ fun ArticleDetailScreen(
                                         ) {
                                             Text(
                                                 text = "Summarizing...",
-                                                style = MaterialTheme.typography.bodyMedium,
+                                                style = TextStyle(fontSize = 14.sp),
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                             Spacer(modifier = Modifier.height(8.dp))
@@ -584,12 +613,12 @@ fun ArticleDetailScreen(
                                     } else if (articleSummary?.isNotEmpty() == true) {
                                         Text(
                                             text = "Summarized by AI",
-                                            style = MaterialTheme.typography.titleMedium,
+                                            style = TextStyle(fontSize = 18.sp),
                                             color = MaterialTheme.colorScheme.primary
                                         )
                                         Text(
                                             text = articleSummary!!,
-                                            style = MaterialTheme.typography.bodyMedium,
+                                            style = TextStyle(fontSize = 16.sp),
                                             modifier = Modifier.padding(top = 8.dp)
                                         )
                                     }
@@ -651,7 +680,7 @@ fun ArticleDetailScreen(
                                 val itemIndex = textContentToIndexMap[item.content] ?: -1
                                 Text(
                                     text = item.content,
-                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                    style = TextStyle(
                                         fontSize = selectedTextSize.size.sp,
                                         fontFamily = selectedFontFamily.fontFamily
                                     ),
@@ -691,8 +720,9 @@ fun ArticleDetailScreen(
                                         Text(
                                             text = item.caption,
                                             style = MaterialTheme.typography.bodySmall.copy(
-                                                fontSize = selectedTextSize.size.sp,
-                                                fontFamily = selectedFontFamily.fontFamily
+                                                fontSize = (selectedTextSize.size - 2).sp,
+                                                fontFamily = selectedFontFamily.fontFamily,
+                                                lineHeight = (selectedTextSize.size + 4).sp
                                             ),
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             modifier = Modifier.padding(horizontal = 16.dp)
@@ -715,7 +745,10 @@ fun ArticleDetailScreen(
                             .fillMaxWidth()
                             .padding(16.dp)
                     ) {
-                        Text("Read Full Here")
+                        Text(
+                            text = "Read Full Here",
+                            style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        )
                     }
                 }
             }
@@ -748,7 +781,7 @@ fun ArticleDetailScreen(
                         ) {
                             Text(
                                 text = "Kiểu chữ",
-                                style = MaterialTheme.typography.titleMedium,
+                                style = TextStyle(fontSize = 16.sp),
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
 
@@ -763,10 +796,16 @@ fun ArticleDetailScreen(
                                     shape = RoundedCornerShape(8.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = if (selectedFontFamily == FontPreset.DEFAULT)
-                                            MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                            Color.Transparent else MaterialTheme.colorScheme.surfaceVariant,
                                         contentColor = if (selectedFontFamily == FontPreset.DEFAULT)
-                                            MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+                                            Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                    ),
+                                    modifier = if (selectedFontFamily == FontPreset.DEFAULT) {
+                                        Modifier.background(
+                                            brush = Brush.horizontalGradient(NewsGradient),
+                                            shape = RoundedCornerShape(8.dp)
+                                        )
+                                    } else Modifier
                                 ) {
                                     Text("SF San-serif")
                                 }
@@ -776,10 +815,16 @@ fun ArticleDetailScreen(
                                     shape = RoundedCornerShape(8.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = if (selectedFontFamily == FontPreset.GEORGIA)
-                                            MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                            Color.Transparent else MaterialTheme.colorScheme.surfaceVariant,
                                         contentColor = if (selectedFontFamily == FontPreset.GEORGIA)
-                                            MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+                                            Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                    ),
+                                    modifier = if (selectedFontFamily == FontPreset.GEORGIA) {
+                                        Modifier.background(
+                                            brush = Brush.horizontalGradient(NewsGradient),
+                                            shape = RoundedCornerShape(8.dp)
+                                        )
+                                    } else Modifier
                                 ) {
                                     Text("Bookerly")
                                 }
@@ -789,10 +834,16 @@ fun ArticleDetailScreen(
                                     shape = RoundedCornerShape(8.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = if (selectedFontFamily == FontPreset.ROBOTO)
-                                            MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                            Color.Transparent else MaterialTheme.colorScheme.surfaceVariant,
                                         contentColor = if (selectedFontFamily == FontPreset.ROBOTO)
-                                            MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+                                            Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                    ),
+                                    modifier = if (selectedFontFamily == FontPreset.ROBOTO) {
+                                        Modifier.background(
+                                            brush = Brush.horizontalGradient(NewsGradient),
+                                            shape = RoundedCornerShape(8.dp)
+                                        )
+                                    } else Modifier
                                 ) {
                                     Text("Roboto")
                                 }
@@ -802,10 +853,16 @@ fun ArticleDetailScreen(
                                     shape = RoundedCornerShape(8.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = if (selectedFontFamily == FontPreset.COURIER)
-                                            MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                            Color.Transparent else MaterialTheme.colorScheme.surfaceVariant,
                                         contentColor = if (selectedFontFamily == FontPreset.COURIER)
-                                            MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+                                            Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                    ),
+                                    modifier = if (selectedFontFamily == FontPreset.COURIER) {
+                                        Modifier.background(
+                                            brush = Brush.horizontalGradient(NewsGradient),
+                                            shape = RoundedCornerShape(8.dp)
+                                        )
+                                    } else Modifier
                                 ) {
                                     Text("Courier")
                                 }
@@ -820,7 +877,7 @@ fun ArticleDetailScreen(
                         ) {
                             Text(
                                 text = "Cỡ chữ",
-                                style = MaterialTheme.typography.titleMedium,
+                                style = TextStyle(fontSize = 16.sp),
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
 
@@ -893,7 +950,10 @@ fun ArticleDetailScreen(
                                 // Title in the center
                                 Text(
                                     text = "Comments",
-                                    style = MaterialTheme.typography.titleLarge,
+                                    style = TextStyle(
+                                        fontSize = 24.sp,
+                                        fontWeight = FontWeight.Bold
+                                    ),
                                     modifier = Modifier.align(Alignment.Center)
                                 )
                             }

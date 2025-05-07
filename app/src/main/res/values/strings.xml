@@ -2,24 +2,51 @@
 <resources>
     <string name="app_name">VNews</string>
     <string name="default_web_client_id">899795293611-lcauiuqpasiustkkplgirnvncmktrf8e.apps.googleusercontent.com</string>
-    
+
+    <!-- Add other categories -->
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_extensions">Tiện ích</string>
+    <string name="nav_community">Cộng đồng</string>
+    <string name="nav_user">Người dùng</string>
+    <!-- Screen Titles -->
+    <string name="article_detail_title">Chi tiết bài báo</string>
+    <string name="extension_detail_title">Chi tiết tiện ích</string>
+    <string name="saved_articles_title">Bài viết đã lưu</string>
+    <string name="viewed_articles_title">Bài viết đã xem</string>
+    <string name="search_title">Tìm kiếm</string>
+    <string name="repository_title">Kho lưu trữ</string>
     <!-- User Screen -->
-    <string name="user_title">Cá Nhân</string>
-    <string name="back">Back</string>
-    <string name="logout">Log out</string>
-    <string name="dark_mode">Dark Mode</string>
-    <string name="language">Language</string>
-    <string name="english">English</string>
+    <string name="user_title">Người dùng</string>
+    <string name="back">Quay lại</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="dark_mode">Chế độ tối</string>
+    <string name="language">Ngôn ngữ</string>
+    <string name="english">Tiếng Anh</string>
     <string name="vietnamese">Tiếng Việt</string>
-    <string name="saved_articles">Saved Articles</string>
-    <string name="viewed_articles">Viewed Articles</string>
-    <string name="follow_facebook">Follow Facebook page</string>
-    <string name="login_with_google">Login with Google</string>
-    
+    <string name="saved_articles">Bài viết đã lưu</string>
+    <string name="viewed_articles">Bài viết đã xem</string>
+    <string name="follow_facebook">Theo dõi Facebook</string>
+    <string name="login_with_google">Đăng nhập bằng Google</string>
+    <!-- values/strings.xml (Vietnamese) -->
+    <string name="category_latest">Tin mới</string>
+    <string name="category_world">Thế giới</string>
+    <string name="category_economy">Kinh tế</string>
+    <string name="category_life">Đời sống</string>
+    <string name="category_health">Sức khỏe</string>
+    <string name="category_culture">Văn hóa</string>
+    <string name="category_entertainment">Giải trí</string>
+    <string name="category_sports">Thể thao</string>
+    <string name="category_technology">Công nghệ</string>
+
     <!-- App Sections -->
-    <string name="app_section">App</string>
-    <string name="connection_section">Connection</string>
-    
+    <string name="app_section">Ứng dụng</string>
+    <string name="connection_section">Kết nối</string>
     <!-- Widget -->
     <string name="latest_article_widget_description" translatable="false">Displays the latest news article on your home screen</string>
+    
+    <!-- Language Change Dialog -->
+    <string name="language_change_notice">Ngôn ngữ sẽ thay đổi sau khi khởi động lại ứng dụng</string>
+    <string name="restart_now">Khởi động lại ngay</string>
+    <string name="changing_language">Đang thay đổi ngôn ngữ...</string>
 </resources>

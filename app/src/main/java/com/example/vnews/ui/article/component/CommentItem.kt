@@ -25,7 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.vnews.utils.DateTimeUtil.getRelativeTimeString
 import com.google.firebase.Timestamp
@@ -83,11 +86,11 @@ fun CommentItem(
             ) {
                 Text(
                     text = senderName,
-                    style = MaterialTheme.typography.bodySmall
+                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold),
                 )
                 Text(
                     text = relativeTime,
-                    style = MaterialTheme.typography.bodySmall
+                    style = TextStyle(fontSize = 12.sp),
                 )
             }
 

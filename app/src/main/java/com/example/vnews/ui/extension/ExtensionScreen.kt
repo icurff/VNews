@@ -19,10 +19,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,23 +29,31 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.composables.icons.lucide.CirclePlus
+import com.composables.icons.lucide.Lucide
+import com.composables.icons.lucide.Trash2
 import com.example.vnews.data.local.entity.ExtensionEntity
 import com.example.vnews.data.remote.dto.RssSource
 import com.example.vnews.ui.navigation.Screen
+import com.example.vnews.ui.theme.NewsBlue
 import com.example.vnews.utils.StringUtils
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,6 +62,9 @@ fun ExtensionScreen(
     navController: NavController,
 ) {
     val selectedTab by extensionViewModel.selectedTab
+    val error by extensionViewModel.error.collectAsState()
+    val successMessage by extensionViewModel.successMessage.collectAsState()
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -84,9 +94,9 @@ fun ExtensionScreen(
                             ) {
                                 Text(
                                     text = "Installed",
-                                    fontSize = 16.sp,
+                                    fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = if (selectedTab == "Installed") Color.Blue else Color.Gray
+                                    color = if (selectedTab == "Installed") NewsBlue else MaterialTheme.colorScheme.onSurface
                                 )
                                 if (selectedTab == "Installed") {
                                     Box(
@@ -94,7 +104,7 @@ fun ExtensionScreen(
                                             .height(3.dp)
                                             .width(35.dp)
                                             .background(
-                                                Color.Blue,
+                                                NewsBlue,
                                                 shape = RoundedCornerShape(
                                                     topStart = 8.dp,
                                                     topEnd = 8.dp
@@ -114,9 +124,9 @@ fun ExtensionScreen(
                             ) {
                                 Text(
                                     text = "Library",
-                                    fontSize = 16.sp,
+                                    fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = if (selectedTab == "Library") Color.Blue else Color.Gray
+                                    color = if (selectedTab == "Library") NewsBlue else MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 if (selectedTab == "Library") {
                                     Box(
@@ -124,7 +134,7 @@ fun ExtensionScreen(
                                             .height(3.dp)
                                             .width(35.dp)
                                             .background(
-                                                Color.Blue,
+                                                NewsBlue,
                                                 shape = RoundedCornerShape(
                                                     topStart = 8.dp,
                                                     topEnd = 8.dp
@@ -163,7 +173,44 @@ fun ExtensionScreen(
                 else -> {}
             }
 
+            // Display error message if any
+            error?.let { errorMessage ->
+                Snackbar(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp),
+                    action = {
+                        TextButton(onClick = { extensionViewModel.clearError() }) {
+                            Text("Dismiss")
+                        }
+                    }
+                ) {
+                    Text(errorMessage)
+                }
 
+                // Auto clear error after 3 seconds
+                LaunchedEffect(errorMessage) {
+                    delay(3000)
+                    extensionViewModel.clearError()
+                }
+            }
+
+            // Display success message if any
+            successMessage?.let { message ->
+                Snackbar(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)
+                ) {
+                    Text(message)
+                }
+
+                // Auto clear success message after 3 seconds
+                LaunchedEffect(message) {
+                    delay(3000)
+                    extensionViewModel.clearSuccessMessage()
+                }
+            }
         }
     }
 }
@@ -188,9 +235,7 @@ fun Library(extensionViewModel: ExtensionViewModel) {
                 items(exts) { extension ->
                     ExtensionItem(
                         extension = extension,
-                        onClick = {
-
-                        },
+                        onClick = {},
                         onAddClick = { extensionViewModel.addExtension(extension) }
                     )
                 }
@@ -239,19 +284,22 @@ fun ExtensionItem(
     Card(
         onClick = onClick,
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 3.dp
+        ),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp),
+                .padding(horizontal = 8.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
                 model = extension.icon,
                 contentDescription = extension.name,
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(52.dp)
                     .padding(8.dp),
                 contentScale = ContentScale.Fit
             )
@@ -261,18 +309,21 @@ fun ExtensionItem(
             ) {
                 Text(
                     text = extension.name,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
                 )
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = extension.source,
-                    style = MaterialTheme.typography.labelSmall,
+                    style = TextStyle(fontSize = 14.sp),
                 )
             }
 
             IconButton(onClick = onAddClick) {
                 Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "Add extension"
+                    imageVector = Lucide.CirclePlus,
+                    contentDescription = "Add extension",
+                    tint = NewsBlue,
+                    modifier = Modifier.size(28.dp)
                 )
             }
         }
@@ -288,12 +339,15 @@ fun InstalledItem(
     Card(
         onClick = onClick,
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 3.dp
+        ),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp),
+                .padding(horizontal = 8.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
@@ -310,17 +364,18 @@ fun InstalledItem(
             ) {
                 Text(
                     text = extension.name,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
                 )
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = extension.source,
-                    style = MaterialTheme.typography.labelSmall,
+                    style = TextStyle(fontSize = 12.sp),
                 )
             }
 
             IconButton(onClick = onDelete) {
                 Icon(
-                    imageVector = Icons.Filled.Delete,
+                    imageVector = Lucide.Trash2,
                     contentDescription = "Delete extension",
                     tint = MaterialTheme.colorScheme.error
                 )
