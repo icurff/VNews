@@ -14,8 +14,8 @@
 
     <!-- Extension Screen -->
     <string name="installed">Đã cài</string>
-    <string name="library">Người dùng</string>
-    <string name="repository">Người dùng</string>
+    <string name="library">Thư viện</string>
+    <string name="repository"> Quản lý mở rộng</string>
     <string name="default_repo">Mặc định</string>
     <!-- User Screen -->
     <string name="user_title">Người dùng</string>

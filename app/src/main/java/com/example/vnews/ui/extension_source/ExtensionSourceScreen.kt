@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -49,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Trash2
+import com.example.vnews.R
 import com.example.vnews.data.local.entity.RepositoryEntity
 import com.example.vnews.ui.theme.NewsGradient
 import kotlinx.coroutines.delay
@@ -72,7 +74,7 @@ fun ExtensionSourceScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Repositories",
+                        text = stringResource(R.string.repository),
                         style = TextStyle(
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,

@@ -65,7 +65,7 @@ fun ExtensionScreen(
 ) {
     val selectedTab by extensionViewModel.selectedTab
     val error by extensionViewModel.error.collectAsState()
-    val successMessage by extensionViewModel.successMessage.collectAsState()
+ //   val successMessage by extensionViewModel.successMessage.collectAsState()
 
     Scaffold(
         topBar = {
@@ -197,22 +197,22 @@ fun ExtensionScreen(
                 }
             }
 
-            // Display success message if any
-            successMessage?.let { message ->
-                Snackbar(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(16.dp)
-                ) {
-                    Text(message)
-                }
-
-                // Auto clear success message after 3 seconds
-                LaunchedEffect(message) {
-                    delay(3000)
-                    extensionViewModel.clearSuccessMessage()
-                }
-            }
+//            // Display success message if any
+//            successMessage?.let { message ->
+//                Snackbar(
+//                    modifier = Modifier
+//                        .align(Alignment.BottomCenter)
+//                        .padding(16.dp)
+//                ) {
+//                    Text(message)
+//                }
+//
+//                // Auto clear success message after 3 seconds
+//                LaunchedEffect(message) {
+//                    delay(3000)
+//                    extensionViewModel.clearSuccessMessage()
+//                }
+//            }
         }
     }
 }
