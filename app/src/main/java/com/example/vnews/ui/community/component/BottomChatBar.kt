@@ -226,7 +226,6 @@ fun BottomChatBar() {
             TextField(
                 value = messageText,
                 onValueChange = { messageText = it },
-                placeholder = { Text("Input message") },
                 modifier = Modifier.weight(1f),
                 shape = RectangleShape,
                 colors = TextFieldDefaults.colors(

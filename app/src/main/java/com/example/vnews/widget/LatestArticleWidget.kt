@@ -217,14 +217,14 @@ class LatestArticleWidget : AppWidgetProvider() {
         
         views.setTextViewText(R.id.widget_article_title, article.title)
         views.setTextViewText(R.id.widget_source_name, article.extensionName)
-        views.setTextViewText(R.id.widget_pub_time, DateTimeUtil.getRelativeTimeString(article.pubTime))
+        views.setTextViewText(R.id.widget_pub_time, DateTimeUtil.getFormattedDateTime(article.pubTime))
         
         val openIntent = Intent(context, MainActivity::class.java).apply {
             action = Intent.ACTION_MAIN
             addCategory(Intent.CATEGORY_LAUNCHER)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             
-            putExtra("SOURCE_URL", article.source.takeIf { it.isNotEmpty() } ?: "https://vnexpress.net")
+            putExtra("SOURCE_URL", article.source.takeIf { it.isNotEmpty() } ?: "")
             putExtra("ARTICLE_TITLE", article.title.takeIf { it.isNotEmpty() } ?: "No Title")
             putExtra("ARTICLE_SUMMARY", article.summary.takeIf { it.isNotEmpty() } ?: "No summary available")
             putExtra("ARTICLE_THUMBNAIL", article.thumbnail.takeIf { it.isNotEmpty() } ?: "")

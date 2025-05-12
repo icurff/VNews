@@ -34,9 +34,6 @@ class RssViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
-
     private val _rssItems = MutableStateFlow<Map<Int, List<RssItem>>>(emptyMap())
     val rssItems: StateFlow<Map<Int, List<RssItem>>> = _rssItems.asStateFlow()
 
@@ -63,13 +60,10 @@ class RssViewModel @Inject constructor(
     }
 
     fun handleRefreshFeed() {
-        _isRefreshing.value = true
         try {
             fetchAllCategories()
         } catch (e: Exception) {
             e.printStackTrace()
-        } finally {
-            _isRefreshing.value = false
         }
     }
 
@@ -93,7 +87,6 @@ class RssViewModel @Inject constructor(
                             val channel = rssParser.getRssChannel(extension.source)
 
                             val items = channel.items.map { item ->
-
                                 RssItem(
                                     title = Jsoup.parse(item.title ?: "").text()
                                         .replace("&apos;", "'"),

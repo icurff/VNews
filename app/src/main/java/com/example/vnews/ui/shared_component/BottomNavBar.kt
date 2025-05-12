@@ -44,7 +44,7 @@ fun BottomNavBar(navController: NavController) {
                 icon = { screen.icon?.invoke() },
                 label = {
                     Text(
-                        text = screen.title,
+                        text = screen.getLocalizedTitle(),
                         style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold),
                         color = if (isSelected) selectedColor else unselectedColor
                     )

@@ -1,4 +1,4 @@
-package com.example.vnews.data.datastore
+package com.example.vnews.ui.user_setting
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -45,8 +45,7 @@ class AppSettingsManager(private val context: Context) {
             preferences[layoutTypeKey] = layoutType.name
         }
     }
-    
-    // Get app settings synchronously (for use during app startup)
+
     suspend fun getAppSettings(): AppSettings? {
         return try {
             appSettings.first()

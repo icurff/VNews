@@ -12,7 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.vnews.ui.navigation.NavGraph
 import com.example.vnews.ui.theme.VNewsTheme
 import dagger.hilt.android.AndroidEntryPoint
-import com.example.vnews.data.datastore.AppSettingsManager
+import com.example.vnews.ui.user_setting.AppSettingsManager
 import com.example.vnews.utils.LanguageManager
 import kotlinx.coroutines.runBlocking
 
@@ -21,10 +21,10 @@ class MainActivity : ComponentActivity() {
     private lateinit var appSettingsManager: AppSettingsManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Initialize AppSettingsManager
+        // init app settings
         appSettingsManager = AppSettingsManager(this)
         
-        // Apply saved language before setting content
+        // apply saved language
         runBlocking {
             val appSettings = appSettingsManager.getAppSettings()
             appSettings?.language?.let { language ->

@@ -3,19 +3,20 @@
     <string name="app_name">VNews</string>
     <string name="default_web_client_id">899795293611-lcauiuqpasiustkkplgirnvncmktrf8e.apps.googleusercontent.com</string>
 
-    <!-- Add other categories -->
+    <!--Article  -->
+
     <!-- Bottom Navigation -->
     <string name="nav_home">Trang chủ</string>
-    <string name="nav_extensions">Tiện ích</string>
+    <string name="nav_extensions">Mở rộng</string>
     <string name="nav_community">Cộng đồng</string>
     <string name="nav_user">Người dùng</string>
-    <!-- Screen Titles -->
-    <string name="article_detail_title">Chi tiết bài báo</string>
-    <string name="extension_detail_title">Chi tiết tiện ích</string>
-    <string name="saved_articles_title">Bài viết đã lưu</string>
-    <string name="viewed_articles_title">Bài viết đã xem</string>
-    <string name="search_title">Tìm kiếm</string>
-    <string name="repository_title">Kho lưu trữ</string>
+    <string name="noComment">Chưa có ai bình luận</string>
+
+    <!-- Extension Screen -->
+    <string name="installed">Đã cài</string>
+    <string name="library">Người dùng</string>
+    <string name="repository">Người dùng</string>
+    <string name="default_repo">Mặc định</string>
     <!-- User Screen -->
     <string name="user_title">Người dùng</string>
     <string name="back">Quay lại</string>
@@ -44,9 +45,56 @@
     <string name="connection_section">Kết nối</string>
     <!-- Widget -->
     <string name="latest_article_widget_description" translatable="false">Displays the latest news article on your home screen</string>
-    
-    <!-- Language Change Dialog -->
-    <string name="language_change_notice">Ngôn ngữ sẽ thay đổi sau khi khởi động lại ứng dụng</string>
-    <string name="restart_now">Khởi động lại ngay</string>
-    <string name="changing_language">Đang thay đổi ngôn ngữ...</string>
+
+
+    <!-- Search Screen -->
+    <string name="search_screen_title">Khám phá</string>
+    <string name="search_placeholder">Tìm kiếm tin tức…</string>
+    <string name="discover_news_title">Khám phá tin tức</string>
+    <string name="discover_news_description">Tìm kiếm chủ đề, tin tức bạn quan tâm.</string>
+
+    <!-- Time related strings -->
+    <string name="just_now">Vừa xong</string>
+    <string name="minutes_short_ago">%d phút</string>
+    <string name="hours_short_ago">%d giờ</string>
+    <string name="days_short_ago">%d ngày</string>
+    <string name="weeks_short_ago">%d tuần</string>
+    <string name="months_short_ago">%d tháng</string>
+    <string name="years_short_ago">%d năm</string>
+
+    <plurals name="minutes_ago">
+        <item quantity="other">%d phút trước</item>
+    </plurals>
+
+    <plurals name="hours_ago">
+        <item quantity="other">%d giờ trước</item>
+    </plurals>
+
+    <plurals name="days_ago">
+        <item quantity="other">%d ngày trước</item>
+    </plurals>
+
+    <plurals name="weeks_ago">
+        <item quantity="other">%d tuần trước</item>
+    </plurals>
+
+    <plurals name="months_ago">
+        <item quantity="other">%d tháng trước</item>
+    </plurals>
+
+    <plurals name="years_ago">
+        <item quantity="other">%d năm trước</item>
+    </plurals>
+
+    <!-- Article Detail -->
+    <string name="customization">Tùy chỉnh</string>
+    <string name="font_type">Kiểu chữ</string>
+    <string name="font_size">Cỡ chữ</string>
+    <string name="summarizedByAi">Tóm tắt bởi AI</string>
+    <string name="summarizing">Đang tóm tắt...</string>
+    <string name="comment">Bình luận</string>
+    <string name="close">Đóng</string>
+    <string name="share_article">Chia sẻ bài viết</string>
+    <string name="text_settings">Cài đặt văn bản</string>
+    <string name="read_full_here">Đọc bài đầy đủ</string>
 </resources>

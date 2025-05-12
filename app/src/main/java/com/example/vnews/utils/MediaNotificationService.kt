@@ -15,6 +15,7 @@ import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.util.NotificationUtil.createNotificationChannel
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
@@ -75,6 +76,9 @@ class MediaNotificationService : Service() {
     inner class LocalBinder : Binder() {
         fun getService(): MediaNotificationService = this@MediaNotificationService
     }
+    override fun onBind(intent: Intent): IBinder {
+        return binder
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -83,54 +87,6 @@ class MediaNotificationService : Service() {
         initializePlayer()
     }
 
-    private fun createNotificationChannel() {
-        val channel = NotificationChannel(
-            CHANNEL_ID,
-            CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_LOW
-        ).apply {
-            description = "VNews media player controls"
-            setShowBadge(false)
-        }
-        notificationManager.createNotificationChannel(channel)
-    }
-
-    private fun initializePlayer() {
-        player = ExoPlayer.Builder(this).build().apply {
-            addListener(object : Player.Listener {
-                override fun onPlaybackStateChanged(playbackState: Int) {
-                    when (playbackState) {
-                        Player.STATE_READY -> {
-                            if (playbackActive) {
-                                updateNotification()
-                            }
-                        }
-
-                        Player.STATE_ENDED -> {
-                            playbackActive = false
-                            updateNotification()
-                        }
-                    }
-                }
-
-                override fun onIsPlayingChanged(isActuallyPlaying: Boolean) {
-                    playbackActive = isActuallyPlaying
-                    updateNotification()
-                }
-
-                override fun onPlayerError(error: PlaybackException) {
-                    playbackActive = false
-                    updateNotification()
-                }
-            })
-        }
-
-        mediaSession = MediaSession.Builder(this, player).build()
-    }
-
-    override fun onBind(intent: Intent): IBinder {
-        return binder
-    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.let { handleIntent(it) }
@@ -202,6 +158,52 @@ class MediaNotificationService : Service() {
     fun setMediaControlCallback(callback: MediaControlCallback) {
         this.mediaControlCallback = callback
     }
+
+    private fun createNotificationChannel() {
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = "VNews media player controls"
+            setShowBadge(false)
+        }
+        notificationManager.createNotificationChannel(channel)
+    }
+
+    private fun initializePlayer() {
+        player = ExoPlayer.Builder(this).build().apply {
+            addListener(object : Player.Listener {
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    when (playbackState) {
+                        Player.STATE_READY -> {
+                            if (playbackActive) {
+                                updateNotification()
+                            }
+                        }
+
+                        Player.STATE_ENDED -> {
+                            playbackActive = false
+                            updateNotification()
+                        }
+                    }
+                }
+
+                override fun onIsPlayingChanged(isActuallyPlaying: Boolean) {
+                    playbackActive = isActuallyPlaying
+                    updateNotification()
+                }
+
+                override fun onPlayerError(error: PlaybackException) {
+                    playbackActive = false
+                    updateNotification()
+                }
+            })
+        }
+
+        mediaSession = MediaSession.Builder(this, player).build()
+    }
+
 
     @OptIn(UnstableApi::class)
     private fun updateNotification() {

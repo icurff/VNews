@@ -1,6 +1,7 @@
 package com.example.vnews.utils
 
 import java.time.Duration
+import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -89,6 +90,14 @@ object DateTimeUtil {
             diff < 31536000000 -> "${diff / 2592000000}mo ago"
             else -> "${diff / 31536000000}y ago"
         }
+    }
+
+    // Hàm mới: Định dạng thời gian theo giờ phút và ngày tháng
+    fun getFormattedDateTime(timestamp: Long): String {
+        val instant = Instant.ofEpochMilli(timestamp)
+        val dateTime = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
+        val formatter = DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy")
+        return dateTime.format(formatter)
     }
 
     // Chuyển đổi chuỗi GMT thành định dạng offset chuẩn

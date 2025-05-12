@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.vnews.utils.DateTimeUtil.getRelativeTimeString
 import com.google.firebase.Timestamp
+import androidx.compose.ui.platform.LocalContext
+import com.example.vnews.utils.DateTimeUtil.getFormattedDateTime
 
 @Composable
 fun CommentItem(
@@ -40,7 +42,7 @@ fun CommentItem(
     senderAvatar: String?,
     timestamp: Timestamp?
 ) {
-    val relativeTime = timestamp?.toDate()?.time?.let { getRelativeTimeString(it) } ?: ""
+    val relativeTime = timestamp?.toDate()?.time?.let { getFormattedDateTime(it) } ?: ""
 
     Row(
         modifier = Modifier

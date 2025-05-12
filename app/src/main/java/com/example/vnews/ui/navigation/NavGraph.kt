@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -17,7 +18,8 @@ import com.composables.icons.lucide.Layers
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.MessageCircleMore
 import com.composables.icons.lucide.User
-import com.example.vnews.data.datastore.AppSettingsManager
+import com.example.vnews.R
+import com.example.vnews.ui.user_setting.AppSettingsManager
 import com.example.vnews.ui.article.ArticleDetailScreen
 import com.example.vnews.ui.article.ArticleViewModel
 import com.example.vnews.ui.article.SavedArticlesScreen
@@ -33,31 +35,39 @@ import com.example.vnews.ui.home.RssViewModel
 import com.example.vnews.ui.search.SearchScreen
 import com.example.vnews.ui.user_setting.UserScreen
 
+object NavTitles {
+    val HOME = R.string.nav_home
+    val EXTENSIONS = R.string.nav_extensions
+    val COMMUNITY = R.string.nav_community
+    val SETTINGS = R.string.nav_user
+}
+
 sealed class Screen(
     val route: String,
+    val titleResId: Int = 0,
     val title: String = "",
     val icon: @Composable (() -> Unit)? = null
 ) {
     object Home : Screen(
         route = "home_graph",
-        title = "Home",
+        titleResId = NavTitles.HOME,
         icon = { Icon(Lucide.House, contentDescription = "Home") })
 
     object Extension : Screen(
         route = "extension",
-        title = "Extensions",
+        titleResId = NavTitles.EXTENSIONS,
         icon = { Icon(Lucide.Layers, contentDescription = "extensions") }
     )
 
     object Community : Screen(
         route = "community",
-        title = "Community",
+        titleResId = NavTitles.COMMUNITY,
         icon = { Icon(Lucide.MessageCircleMore, contentDescription = "Settings") }
     )
 
     object Settings : Screen(
         route = "settings",
-        title = "User",
+        titleResId = NavTitles.SETTINGS,
         icon = { Icon(Lucide.User, contentDescription = "User") }
     )
 
@@ -76,6 +86,16 @@ sealed class Screen(
     object Search : Screen("search")
 
     object Repository : Screen("repository")
+    
+    // Helper function to get localized title in a Composable context
+    @Composable
+    fun getLocalizedTitle(): String {
+        return if (titleResId != 0) {
+            stringResource(id = titleResId)
+        } else {
+            title
+        }
+    }
 }
 
 @Composable
@@ -400,7 +420,7 @@ fun NavGraph(
                 val articleViewModel = hiltViewModel<ArticleViewModel>(parentEntry)
 
                 SavedArticlesScreen(
-                    title = "Saved Articles",
+                    title = stringResource(R.string.saved_articles),
                     navController = navController,
                     articleViewModel = articleViewModel
                 )
@@ -439,7 +459,7 @@ fun NavGraph(
                 val articleViewModel = hiltViewModel<ArticleViewModel>(parentEntry)
 
                 ViewedArticlesScreen(
-                    title = "Viewed Articles",
+                    title = stringResource(R.string.viewed_articles),
                     navController = navController,
                     articleViewModel = articleViewModel
                 )

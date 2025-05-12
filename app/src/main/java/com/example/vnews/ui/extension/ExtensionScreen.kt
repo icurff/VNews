@@ -39,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -48,6 +49,7 @@ import coil.compose.AsyncImage
 import com.composables.icons.lucide.CirclePlus
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Trash2
+import com.example.vnews.R
 import com.example.vnews.data.local.entity.ExtensionEntity
 import com.example.vnews.data.remote.dto.RssSource
 import com.example.vnews.ui.navigation.Screen
@@ -93,7 +95,7 @@ fun ExtensionScreen(
                                     .padding(vertical = 8.dp)
                             ) {
                                 Text(
-                                    text = "Installed",
+                                    text = stringResource(R.string.installed),
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = if (selectedTab == "Installed") NewsBlue else MaterialTheme.colorScheme.onSurface
@@ -123,7 +125,7 @@ fun ExtensionScreen(
                                     .padding(vertical = 8.dp)
                             ) {
                                 Text(
-                                    text = "Library",
+                                    text = stringResource(R.string.library),
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = if (selectedTab == "Library") NewsBlue else MaterialTheme.colorScheme.onSurfaceVariant

@@ -77,10 +77,12 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -102,6 +104,7 @@ import com.example.vnews.utils.DateTimeUtil
 import com.example.vnews.utils.StringUtils
 import com.example.vnews.utils.TextToSpeechUtil
 import kotlinx.coroutines.launch
+import java.util.*
 
 // Text size presets
 enum class TextSizePreset(val size: Float) {
@@ -397,7 +400,7 @@ fun ArticleDetailScreen(
                             IconButton(onClick = { showFontCustomizationSheet = true }) {
                                 Icon(
                                     imageVector = Lucide.Settings2,
-                                    contentDescription = "Text Settings"
+                                    contentDescription = stringResource(R.string.text_settings)
                                 )
                             }
                         }
@@ -531,7 +534,7 @@ fun ArticleDetailScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = DateTimeUtil.getRelativeTime(selectedArticle?.pubTime ?: 0),
+                            text = DateTimeUtil.getFormattedDateTime(selectedArticle?.pubTime ?: 0),
                             style = TextStyle(fontSize = 14.sp),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -548,7 +551,7 @@ fun ArticleDetailScreen(
                             if (articleSummary?.isNotEmpty() == true) {
                                 Icon(
                                     imageVector = Icons.Filled.Close,
-                                    contentDescription = "Đóng tóm tắt"
+                                    contentDescription = stringResource(R.string.close)
                                 )
                             } else {
                                 Icon(
@@ -603,7 +606,7 @@ fun ArticleDetailScreen(
                                             horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
                                             Text(
-                                                text = "Summarizing...",
+                                                text = stringResource(R.string.summarizing),
                                                 style = TextStyle(fontSize = 14.sp),
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
@@ -612,7 +615,7 @@ fun ArticleDetailScreen(
                                         }
                                     } else if (articleSummary?.isNotEmpty() == true) {
                                         Text(
-                                            text = "Summarized by AI",
+                                            text = stringResource(R.string.summarizedByAi),
                                             style = TextStyle(fontSize = 18.sp),
                                             color = MaterialTheme.colorScheme.primary
                                         )
@@ -746,7 +749,7 @@ fun ArticleDetailScreen(
                             .padding(16.dp)
                     ) {
                         Text(
-                            text = "Read Full Here",
+                            text = stringResource(R.string.read_full_here),
                             style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         )
                     }
@@ -765,7 +768,7 @@ fun ArticleDetailScreen(
                             .padding(bottom = 24.dp)
                     ) {
                         Text(
-                            text = "Tùy chỉnh",
+                            text = stringResource(R.string.customization),
                             style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -780,7 +783,7 @@ fun ArticleDetailScreen(
                                 .padding(horizontal = 16.dp)
                         ) {
                             Text(
-                                text = "Kiểu chữ",
+                                text = stringResource(R.string.font_type),
                                 style = TextStyle(fontSize = 16.sp),
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
@@ -876,7 +879,7 @@ fun ArticleDetailScreen(
                                 .padding(horizontal = 16.dp, vertical = 16.dp)
                         ) {
                             Text(
-                                text = "Cỡ chữ",
+                                text = stringResource(R.string.font_size),
                                 style = TextStyle(fontSize = 16.sp),
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
@@ -943,13 +946,13 @@ fun ArticleDetailScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
-                                        contentDescription = "Close"
+                                        contentDescription = stringResource(R.string.close)
                                     )
                                 }
 
                                 // Title in the center
                                 Text(
-                                    text = "Comments",
+                                    text = stringResource(R.string.comment),
                                     style = TextStyle(
                                         fontSize = 24.sp,
                                         fontWeight = FontWeight.Bold
@@ -973,7 +976,7 @@ fun ArticleDetailScreen(
                                             contentAlignment = Alignment.Center
                                         ) {
                                             Text(
-                                                text = "No comments yet",
+                                                text = stringResource(R.string.noComment),
                                                 style = MaterialTheme.typography.bodyLarge,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )

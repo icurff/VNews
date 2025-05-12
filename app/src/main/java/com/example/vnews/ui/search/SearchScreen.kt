@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.vnews.R
 import com.example.vnews.ui.article.ArticleViewModel
 import com.example.vnews.ui.home.RssViewModel
 import com.example.vnews.ui.home.component.RssFeedList
@@ -57,7 +59,7 @@ fun SearchScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Discover",
+                        text = stringResource(R.string.search_screen_title),
                         style = TextStyle(
                             fontSize = 28.sp,
                             fontWeight = FontWeight.Bold,
@@ -91,7 +93,7 @@ fun SearchScreen(
                     onValueChange = { searchQuery = it },
                     placeholder = {
                         Text(
-                            "Search for news...",
+                            stringResource(R.string.search_placeholder),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     },
@@ -152,7 +154,7 @@ fun SearchScreen(
                         }
 
                         Text(
-                            text = "Discover News",
+                            text = stringResource(R.string.discover_news_title),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -160,7 +162,7 @@ fun SearchScreen(
                         )
 
                         Text(
-                            text = "Search for topics, publications, or keywords to find the news you're interested in.",
+                            text = stringResource(R.string.discover_news_description),
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -169,7 +171,6 @@ fun SearchScreen(
                     }
                 }
             } else {
-                // Search results
                 RssFeedList(
                     rssViewModel = rssViewModel,
                     articleViewModel = articleViewModel,

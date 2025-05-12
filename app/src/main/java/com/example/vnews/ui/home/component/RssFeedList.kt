@@ -48,6 +48,7 @@ import com.example.vnews.ui.home.RssViewModel
 import com.example.vnews.ui.navigation.Screen
 import com.example.vnews.utils.DateTimeUtil
 import com.example.vnews.utils.StringUtils
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,13 +63,11 @@ fun RssFeedList(
 ) {
     val rssItems by rssViewModel.rssItems.collectAsState()
     val isLoading by rssViewModel.isLoading.collectAsState()
-//    val isRefreshing by rssViewModel.isRefreshing.collectAsState()
 
-    // If categoryId is null, get items from all categories for global search
+    // If categoryId is null, get items from all categories search
     val itemsList = if (categoryId != null) {
         rssItems[categoryId] ?: emptyList()
     } else {
-        // Combine items from all categories
         rssItems.values.flatten()
     }
 

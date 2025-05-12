@@ -1,6 +1,7 @@
 package com.example.vnews.ui.user_setting
 
 import android.app.Activity
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -92,291 +93,242 @@ fun UserScreen(
     val scope = rememberCoroutineScope()
 
     var showLanguageDropdown by remember { mutableStateOf(false) }
-    var isChangingLanguage by remember { mutableStateOf(false) }
 
-    // Animation for rotation when changing language
-    val infiniteTransition = rememberInfiniteTransition(label = "restartAnimation")
-    val rotation = infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "rotationAnimation"
-    )
+    // Function to restart activity without animation
+    fun restartActivity(context: Context) {
+        val activity = context as? Activity
+        if (activity != null) {
+            val intent = activity.intent
+            activity.finish()
+            activity.startActivity(intent)
+        }
+    }
 
     // Language change handler
     fun changeLanguage(languageCode: String) {
         if (appSettings.language != languageCode) {
-            isChangingLanguage = true
             scope.launch {
                 // First update the preferences
                 appSettingsViewModel.setLanguage(languageCode)
-
-                // Show animation for 1.5 seconds
-                delay(1500)
-
-                // Then force recreate using the current activity context
-                val activity = context as? Activity
-                if (activity != null) {
-                    // Re-apply locale settings directly to activity context
-                    LanguageManager.setLocale(activity, languageCode)
-                }
+                
+                // Apply new locale settings
+                LanguageManager.setLocale(context, languageCode)
+                
+                // Restart activity without animation
+                restartActivity(context)
             }
         }
         showLanguageDropdown = false
     }
 
-    AnimatedVisibility(
-        visible = !isChangingLanguage,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(R.string.user_title),
-                            style = TextStyle(
-                                fontSize = 24.sp, fontWeight = FontWeight.Bold,
-                            )
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.user_title),
+                        style = TextStyle(
+                            fontSize = 24.sp, fontWeight = FontWeight.Bold,
                         )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
+                    }
+                },
+                actions = {
+                    if (isLoggedIn) {
+                        IconButton(onClick = { viewModel.signOut(context as Activity) }) {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.back)
+                                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                contentDescription = stringResource(R.string.logout)
                             )
-                        }
-                    },
-                    actions = {
-                        if (isLoggedIn) {
-                            IconButton(onClick = { viewModel.signOut(context as Activity) }) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                                    contentDescription = stringResource(R.string.logout)
-                                )
-                            }
                         }
                     }
+                }
+            )
+        },
+        bottomBar = { BottomNavBar(navController) }
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                UserProfile(
+                    isLoggedIn = isLoggedIn,
+                    userName = userName,
+                    userPhotoUrl = userPhotoUrl,
+                    onGoogleSignInClick = { viewModel.signInWithGoogle(context as Activity) }
                 )
-            },
-            bottomBar = { BottomNavBar(navController) }
-        ) { innerPadding ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    UserProfile(
-                        isLoggedIn = isLoggedIn,
-                        userName = userName,
-                        userPhotoUrl = userPhotoUrl,
-                        onGoogleSignInClick = { viewModel.signInWithGoogle(context as Activity) }
+            }
+
+            // App Section
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.app_section),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+            }
 
-                // App Section
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .padding(16.dp)
+            // Theme Setting
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = stringResource(R.string.app_section),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.DarkMode,
+                                contentDescription = stringResource(R.string.dark_mode),
+                                tint = Color.Gray,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.dark_mode),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        }
+                        Switch(
+                            checked = appSettings.isDarkTheme,
+                            onCheckedChange = { appSettingsViewModel.setDarkTheme(it) }
                         )
                     }
                 }
+            }
 
-                // Theme Setting
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.DarkMode,
-                                    contentDescription = stringResource(R.string.dark_mode),
-                                    tint = Color.Gray,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Text(
-                                    text = stringResource(R.string.dark_mode),
-                                    style = MaterialTheme.typography.titleLarge
-                                )
-                            }
-                            Switch(
-                                checked = appSettings.isDarkTheme,
-                                onCheckedChange = { appSettingsViewModel.setDarkTheme(it) }
-                            )
-                        }
-                    }
-                }
-
-                // Language Setting
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Language,
-                                    contentDescription = stringResource(R.string.language),
-                                    tint = Color.Gray,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Text(
-                                    text = stringResource(R.string.language),
-                                    style = MaterialTheme.typography.titleLarge
-                                )
-                            }
-
-                            Box {
-                                Text(
-                                    text = when (appSettings.language) {
-                                        "en" -> stringResource(R.string.english)
-                                        "vi" -> stringResource(R.string.vietnamese)
-                                        else -> stringResource(R.string.english)
-                                    },
-                                    style = TextStyle(fontSize = 16.sp),
-                                    modifier = Modifier.clickable { showLanguageDropdown = true }
-                                )
-
-                                DropdownMenu(
-                                    expanded = showLanguageDropdown,
-                                    onDismissRequest = { showLanguageDropdown = false }
-                                ) {
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.english)) },
-                                        onClick = { changeLanguage("en") }
-                                    )
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.vietnamese)) },
-                                        onClick = { changeLanguage("vi") }
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // App - Saved Articles
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { navController.navigate(Screen.SavedArticles.route) }
-                            .padding(horizontal = 16.dp)
+            // Language Setting
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Outlined.BookmarkBorder,
-                                contentDescription = stringResource(R.string.saved_articles),
+                                imageVector = Icons.Outlined.Language,
+                                contentDescription = stringResource(R.string.language),
                                 tint = Color.Gray,
                                 modifier = Modifier.size(24.dp)
                             )
                             Text(
-                                text = stringResource(R.string.saved_articles),
+                                text = stringResource(R.string.language),
                                 style = MaterialTheme.typography.titleLarge
                             )
                         }
-                    }
-                }
 
-                // App - Viewed Articles
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { navController.navigate(Screen.ViewedArticles.route) }
-                            .padding(16.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Visibility,
-                                contentDescription = stringResource(R.string.viewed_articles),
-                                tint = Color.Gray,
-                                modifier = Modifier.size(24.dp)
-                            )
+                        Box {
                             Text(
-                                text = stringResource(R.string.viewed_articles),
-                                style = MaterialTheme.typography.titleLarge
+                                text = when (appSettings.language) {
+                                    "en" -> stringResource(R.string.english)
+                                    "vi" -> stringResource(R.string.vietnamese)
+                                    else -> stringResource(R.string.english)
+                                },
+                                style = TextStyle(fontSize = 16.sp),
+                                modifier = Modifier.clickable { showLanguageDropdown = true }
                             )
+
+                            DropdownMenu(
+                                expanded = showLanguageDropdown,
+                                onDismissRequest = { showLanguageDropdown = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.english)) },
+                                    onClick = { changeLanguage("en") }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.vietnamese)) },
+                                    onClick = { changeLanguage("vi") }
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
-    }
 
-    // Show loading animation when changing language
-    AnimatedVisibility(
-        visible = isChangingLanguage,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Language,
-                    contentDescription = "Changing Language",
-                    tint = MaterialTheme.colorScheme.primary,
+            // App - Saved Articles
+            item {
+                Box(
                     modifier = Modifier
-                        .size(72.dp)
-                        .padding(8.dp)
-                        .clickable { }
-                        .padding(8.dp)
-                        .rotate(rotation.value)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = stringResource(R.string.changing_language),
-                    style = MaterialTheme.typography.headlineSmall,
-                    textAlign = TextAlign.Center
-                )
+                        .fillMaxWidth()
+                        .clickable { navController.navigate(Screen.SavedArticles.route) }
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.BookmarkBorder,
+                            contentDescription = stringResource(R.string.saved_articles),
+                            tint = Color.Gray,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.saved_articles),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
+                }
+            }
+
+            // App - Viewed Articles
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { navController.navigate(Screen.ViewedArticles.route) }
+                        .padding(16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Visibility,
+                            contentDescription = stringResource(R.string.viewed_articles),
+                            tint = Color.Gray,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.viewed_articles),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
+                }
             }
         }
     }

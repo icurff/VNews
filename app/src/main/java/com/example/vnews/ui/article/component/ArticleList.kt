@@ -37,6 +37,7 @@ import com.example.vnews.ui.home.RssItem
 import com.example.vnews.ui.navigation.Screen
 import com.example.vnews.utils.DateTimeUtil
 import com.example.vnews.utils.StringUtils
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun ArticleList(

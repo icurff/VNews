@@ -3,8 +3,6 @@ package com.example.vnews.ui.user_setting
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.vnews.data.datastore.AppSettings
-import com.example.vnews.data.datastore.AppSettingsManager
 import com.example.vnews.utils.LanguageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

@@ -54,8 +54,6 @@ import kotlinx.coroutines.launch
 fun BottomCommentBar(encodedArticlePath: String) {
     var commentText by remember { mutableStateOf("") }
     val context = LocalContext.current
-
-    // Create SpeechRecognitionUtil instance
     val speechRecognitionUtil = remember { SpeechRecognitionUtil(context) }
     val isListening by speechRecognitionUtil.isListening.collectAsState()
     val speechText by speechRecognitionUtil.speechText.collectAsState()
@@ -157,7 +155,6 @@ fun BottomCommentBar(encodedArticlePath: String) {
                 TextField(
                     value = commentText,
                     onValueChange = { commentText = it },
-                    placeholder = { Text("Input comment") },
                     modifier = Modifier.weight(1f),
                     shape = RectangleShape,
                     colors = TextFieldDefaults.colors(

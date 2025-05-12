@@ -245,8 +245,7 @@ class ArticleViewModel @Inject constructor(
                 val summary = geminiService.summarizeArticle(article.title, articleText)
                 _articleSummary.value = summary
             } catch (e: Exception) {
-                Log.e("ArticleViewModel", "Error summarizing article", e)
-                _articleSummary.value = "Lỗi khi tạo tóm tắt: ${e.message}"
+                _articleSummary.value = "Please try again"
             } finally {
                 _isSummarizing.value = false
             }

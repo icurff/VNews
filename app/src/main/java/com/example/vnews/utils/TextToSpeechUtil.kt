@@ -39,6 +39,14 @@ class TextToSpeechUtil(
     // Flag to track service binding state
     private var isServiceBound = false
 
+
+    private fun connectToMediaService() {
+        if (!isServiceBound) {
+            val intent = Intent(context, MediaNotificationService::class.java)
+            context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
     // Service connection object
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -65,9 +73,7 @@ class TextToSpeechUtil(
         textToSpeech = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
                 textToSpeech?.setLanguage(Locale("vi"))
-
                 textToSpeech?.setSpeechRate(_speechRate.value)
-
                 _isInitialized.value = true
             } else {
                 _isInitialized.value = false
@@ -94,6 +100,7 @@ class TextToSpeechUtil(
                     val indexStr = utteranceId.removePrefix("article_item_")
                     val index = indexStr.toIntOrNull() ?: -1
                     if (index >= 0 && index < contentItems.size - 1) {
+                        // play next item
                         playContentItem(index + 1)
                     } else {
                         clearStates()
@@ -106,37 +113,6 @@ class TextToSpeechUtil(
             }
 
         })
-    }
-
-    private fun clearStates() {
-        _isSpeaking.value = false
-        _isPaused.value = false
-        _currentItemIndex.value = -1
-
-        syncStateWithViewModel()
-    }
-
-    private fun syncStateWithViewModel() {
-        viewModel?.updateTtsState(
-            isSpeaking = _isSpeaking.value,
-            isPaused = _isPaused.value,
-            currentItemIndex = _currentItemIndex.value,
-            speechRate = _speechRate.value
-        )
-
-        updateNotification()
-    }
-
-    fun setContentItems(items: List<String>) {
-        contentItems = items
-    }
-
-
-    private fun connectToMediaService() {
-        if (!isServiceBound) {
-            val intent = Intent(context, MediaNotificationService::class.java)
-            context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
-        }
     }
 
     fun playContentItem(index: Int) {
@@ -333,4 +309,27 @@ class TextToSpeechUtil(
             isPlaying = _isSpeaking.value
         )
     }
+
+    private fun syncStateWithViewModel() {
+        viewModel?.updateTtsState(
+            isSpeaking = _isSpeaking.value,
+            isPaused = _isPaused.value,
+            currentItemIndex = _currentItemIndex.value,
+            speechRate = _speechRate.value
+        )
+
+        updateNotification()
+    }
+
+    fun setContentItems(items: List<String>) {
+        contentItems = items
+    }
+    private fun clearStates() {
+        _isSpeaking.value = false
+        _isPaused.value = false
+        _currentItemIndex.value = -1
+
+        syncStateWithViewModel()
+    }
+
 }

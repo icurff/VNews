@@ -55,7 +55,7 @@ import com.composables.icons.lucide.LayoutList
 import com.composables.icons.lucide.LayoutPanelLeft
 import com.composables.icons.lucide.Lucide
 import com.example.vnews.data.data_provider.Categories
-import com.example.vnews.data.datastore.AppSettingsManager
+import com.example.vnews.ui.user_setting.AppSettingsManager
 import com.example.vnews.ui.article.ArticleViewModel
 import com.example.vnews.ui.home.component.RssFeedList
 import com.example.vnews.ui.navigation.Screen

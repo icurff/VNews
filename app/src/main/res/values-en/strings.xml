@@ -1,20 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">VNews</string>
+    <!-- Time related strings -->
+    <string name="just_now">Just now</string>
+    <string name="minutes_short_ago">%dm ago</string>
+    <string name="hours_short_ago">%dh ago</string>
+    <string name="days_short_ago">%dd ago</string>
+    <string name="weeks_short_ago">%dw ago</string>
+    <string name="months_short_ago">%dmo ago</string>
+    <string name="years_short_ago">%dy ago</string>
 
-    <!-- Add other categories -->
+    <plurals name="minutes_ago">
+        <item quantity="one">%d minute ago</item>
+        <item quantity="other">%d minutes ago</item>
+    </plurals>
+
+    <plurals name="hours_ago">
+        <item quantity="one">%d hour ago</item>
+        <item quantity="other">%d hours ago</item>
+    </plurals>
+
+    <plurals name="days_ago">
+        <item quantity="one">%d day ago</item>
+        <item quantity="other">%d days ago</item>
+    </plurals>
+
+    <plurals name="weeks_ago">
+        <item quantity="one">%d week ago</item>
+        <item quantity="other">%d weeks ago</item>
+    </plurals>
+
+    <plurals name="months_ago">
+        <item quantity="one">%d month ago</item>
+        <item quantity="other">%d months ago</item>
+    </plurals>
+
+    <plurals name="years_ago">
+        <item quantity="one">%d year ago</item>
+        <item quantity="other">%d years ago</item>
+    </plurals>
+
+    <!-- Article Detail -->
+    <string name="customization">Customization</string>
+    <string name="font_type">Font Type</string>
+    <string name="font_size">Font Size</string>
+    <string name="summarizedByAi">Summarized by AI</string>
+    <string name="summarizing">Summarizing...</string>
+    <string name="comment">Comments</string>
+    <string name="noComment">No comments yet</string>
+
+
+    <string name="close">Close</string>
+    <string name="share_article">Share Article</string>
+    <string name="text_settings">Text Settings</string>
+    <string name="read_full_here">Read Full Here</string>
+
     <!-- Bottom Navigation -->
     <string name="nav_home">Home</string>
     <string name="nav_extensions">Extensions</string>
     <string name="nav_community">Community</string>
     <string name="nav_user">User</string>
-    <!-- Screen Titles -->
-    <string name="article_detail_title">Article Detail</string>
-    <string name="extension_detail_title">Extension Detail</string>
-    <string name="saved_articles_title">Saved Articles</string>
-    <string name="viewed_articles_title">Viewed Articles</string>
-    <string name="search_title">Search</string>
-    <string name="repository_title">Repository</string>
+
+    <!-- Extension Screen -->
+    <string name="installed">Installed</string>
+    <string name="library">Library</string>
+    <string name="repository">Repository</string>
+    <string name="default_repo">Default</string>
+
     <!-- User Screen -->
     <string name="user_title">User</string>
     <string name="back">Back</string>
@@ -40,9 +92,13 @@
     <!-- App Sections -->
     <string name="app_section">App</string>
     <string name="connection_section">Connection</string>
-    
-    <!-- Language Change Dialog -->
-    <string name="language_change_notice">Language will change after restarting the app</string>
-    <string name="restart_now">Restart Now</string>
-    <string name="changing_language">Changing language...</string>
+
+    <!-- Search Screen -->
+    <string name="search_screen_title">Discover</string>
+    <string name="search_placeholder">Search for news…</string>
+    <string name="discover_news_title">Discover News</string>
+    <string name="discover_news_description">Search for topics, publications, or keywords to find the news you\'re interested in.</string>
+
+
+
 </resources> 

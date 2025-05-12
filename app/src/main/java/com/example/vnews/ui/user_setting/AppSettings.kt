@@ -1,4 +1,4 @@
-package com.example.vnews.data.datastore
+package com.example.vnews.ui.user_setting
 
 import com.example.vnews.ui.home.LayoutType
 

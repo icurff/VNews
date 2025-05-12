@@ -25,7 +25,7 @@ object WebScraper {
 
                 content?.children()?.forEach { element ->
                     when (element.tagName()) {
-                        "p" -> {
+                        "p", "h1", "h2", "h3"-> {
                             val text = element.text().trim()
                             if (text.isNotEmpty()) {
                                 items.add(ArticleItem.Text(text))
@@ -34,7 +34,7 @@ object WebScraper {
 
                         "div" -> {
                             if (element.hasClass("VCSortableInPreviewMode")) {
-                                // Xử lý danh sách ảnh trong album
+                                // multi figure
                                 val images = element.select("figure.media-item img")
                                 val caption = element.selectFirst("figcaption p")?.text()?.trim() ?: ""
 
@@ -51,7 +51,7 @@ object WebScraper {
                         }
 
                         "figure" -> {
-                            // Xử lý ảnh đơn lẻ
+                            // single figure
                             val img = element.selectFirst("img")
                             val sourceUrl = img?.attr("data-src")
                                 ?.takeIf { it.isNotEmpty() }
